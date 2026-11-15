@@ -18,6 +18,8 @@ def build():
     bad = [s["id"] for s in data["sessions"] if s["room"] not in rooms] + \
           [t["id"] for t in data["talks"] if t["session"] not in sess]
     if bad: sys.exit("Unknown room/session references: " + ", ".join(bad[:10]))
+    if os.path.exists(p("data", "info.json")):
+        data["info"] = json.load(open(p("data", "info.json"), encoding="utf-8"))
     if os.path.exists(p("data", "survey.json")):
         data["meta"]["surveyFrom"] = json.load(open(p("data", "survey.json"), encoding="utf-8")).get("showInAppFrom")
     tpl = open(p("src", "template.html"), encoding="utf-8").read()

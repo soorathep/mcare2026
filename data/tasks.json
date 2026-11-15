@@ -296,6 +296,15 @@
    "due": "2026-12-18",
    "status": "todo",
    "note": "poster-results.html"
+  },
+  {
+   "id": 33,
+   "title": "Clear test data before the conference: survey responses, test scores, sample judges",
+   "category": "Web app and QR",
+   "owner": "Soorathep",
+   "due": "2026-12-12",
+   "status": "todo",
+   "note": "D1 Console: DELETE FROM responses; DELETE FROM scores; then load the real judges"
   }
  ]
 }

@@ -134,7 +134,7 @@ button{font:inherit;color:inherit}
 .zone[aria-pressed="true"] span{color:#fff}
 .empty-s{padding:28px 20px;text-align:center;color:var(--graphite);font-size:14px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav.tabs div{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);height:68px}
+nav.tabs div{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:68px}
 nav.tabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:500;color:var(--slate)}
 nav.tabs a[aria-current="page"]{color:var(--teal);font-weight:700}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -241,6 +241,7 @@ var IC = {
   mega: '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A5F0E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
   search: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#66727C" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
   share: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
+  info: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>',
   chev: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#66727C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'
 };
 function starBtn(id){
@@ -256,6 +257,7 @@ function shell(body, tab){
     '<a href="' + href() + '"' + (tab === 'now' ? ' aria-current="page"' : '') + '>' + IC.now + 'Now</a>' +
     '<a href="' + href({view:'schedule'}) + '"' + (tab === 'schedule' ? ' aria-current="page"' : '') + '>' + IC.cal + 'Schedule</a>' +
     '<a href="' + href({view:'agenda'}) + '"' + (tab === 'agenda' ? ' aria-current="page"' : '') + '>' + IC.star.replace('width="20" height="20"','width="22" height="22"') + 'My Agenda</a>' +
+    '<a href="' + href({view:'info'}) + '"' + (tab === 'info' ? ' aria-current="page"' : '') + '>' + IC.info + 'Info</a>' +
     '</div></nav>';
   return top + '<div class="wrap">' + body + '</div>' + nav;
 }
@@ -559,6 +561,21 @@ function drawSlots(day, scroll){
   if (scroll) { var el = document.getElementById('nowslot'); if (el) el.scrollIntoView({block: 'start'}); }
 }
 
+/* ---------- INFO ---------- */
+function viewInfo(){
+  var h = '<header class="whdr" style="padding-top:18px"><h1 style="font-size:28px">Info</h1><span class="meta" style="font-size:13px">' + esc(D.meta.name) + ' · ' + esc(D.meta.venue) + ' · 14–18 Dec 2026</span></header>';
+  ((D.info && D.info.sections) || []).forEach(function(sec){
+    h += '<div class="sec"><h2>' + esc(sec.title) + '</h2></div><div class="dl" style="margin-top:0">';
+    sec.items.forEach(function(it){
+      var txt = it.text ? esc(it.text) : '<span class="muted" style="font-weight:400">To be announced</span>';
+      if (it.link && it.text) txt = '<a class="link" style="font-size:14px" href="' + (it.link.charAt(0) === '?' ? href(Object.fromEntries(new URLSearchParams(it.link.slice(1)))) : esc(it.link)) + '">' + esc(it.text) + '</a>';
+      h += '<div><span>' + esc(it.label) + '</span><span style="font-weight:500">' + txt + '</span></div>';
+    });
+    h += '</div>';
+  });
+  return shell(h, 'info');
+}
+
 /* ---------- AGENDA ---------- */
 function viewAgenda(){
   var h = '<header class="whdr" style="padding-top:18px"><h1 style="font-size:28px">My Agenda</h1><span class="meta" style="font-size:13px">Saved on this phone only</span></header>';
@@ -736,7 +753,8 @@ function render(){
     Q.get('map') ? viewMap() :
     Q.get('posters') ? viewPosters() :
     v === 'schedule' ? viewSchedule() :
-    v === 'agenda' ? viewAgenda() : viewNow();
+    v === 'agenda' ? viewAgenda() :
+    v === 'info' ? viewInfo() : viewNow();
   app.innerHTML = html;
 }
 render();

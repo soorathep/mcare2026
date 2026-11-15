@@ -91,7 +91,7 @@ function show(){
       return r; });
     rows.sort(function(a, b){ return (b.total == null ? -1 : b.total) - (a.total == null ? -1 : a.total) || (b.z || 0) - (a.z || 0); });
     var rank = 0, last = null;
-    h += '<div class="card"><h2>Session ' + cur + ' ranking</h2><p class="note">Ranked by mean total. "Adj." is the mean z-score after adjusting for each judge\'s strictness; use it to check close calls. Rows in red still need scores.</p><div class="tw"><table><tr><th>Rank</th><th>Board</th><th>Poster</th><th>Sym.</th>' + CR.map(function(c){ return '<th class="n" title="' + esc(c.name) + '">' + esc(c.name.split(' ')[0]) + '</th>'; }).join('') + '<th class="n">Total</th><th class="n">Adj.</th><th class="n">Judges</th></tr>';
+    h += '<div class="card"><h2>Session ' + cur + ' ranking</h2><p class="note">Ranked by mean total. "Adj." is the mean z-score after adjusting for each judge\'s strictness; use it to check close calls. A red judge count means the poster still needs scores.</p><div class="tw"><table><tr><th>Rank</th><th>Board</th><th>Poster</th><th>Sym.</th>' + CR.map(function(c){ return '<th class="n" title="' + esc(c.name) + '">' + esc(c.name.split(' ')[0]) + '</th>'; }).join('') + '<th class="n">Total</th><th class="n">Adj.</th><th class="n">Judges</th></tr>';
     rows.forEach(function(r, i){
       if (r.total !== last) { rank = i + 1; last = r.total; }
       var inc = r.n < r.need;

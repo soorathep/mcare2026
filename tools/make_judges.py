@@ -78,12 +78,12 @@ def main():
     cards = "".join(f"""<div class="card"><div class="h">MCARE 2026 · Poster judge</div><div class="n">{html.escape(n)}</div>
 <div class="row"><div class="qr" data-u="{SITE}judge.html#code={j['code']}"></div><div><div class="l">Judge code</div><div class="c">{j['code']}</div>
 <div class="l">Scan to start, or open {SITE.replace('https://','')}judge.html</div></div></div>
-<div class="l">Your posters ({len(j['boards'])})</div><div class="b">{', '.join(j['boards'])}</div></div>""" for n, j in judges.items())
+<div class="l">Your posters ({len(j['boards'])})</div><div class="b">{', '.join('<span class="nw">' + b + '</span>' for b in j['boards'])}</div></div>""" for n, j in judges.items())
     open(os.path.join(PRIV, "judge_cards.html"), "w", encoding="utf-8").write(f"""<!doctype html><html><head><meta charset="utf-8"><title>Judge cards</title>
 <style>body{{font-family:Helvetica,Arial,sans-serif;margin:0;padding:10mm;color:#1C242B}}.card{{border:1px solid #B9C1C6;border-radius:4mm;padding:6mm;margin-bottom:6mm;page-break-inside:avoid}}
 .h{{font-size:9pt;color:#0F6E6B;font-weight:bold;text-transform:uppercase;letter-spacing:.05em}}.n{{font-size:16pt;font-weight:bold;margin:2mm 0 4mm}}
 .row{{display:flex;gap:6mm;align-items:center;margin-bottom:4mm}}.qr{{width:32mm;height:32mm}}.qr svg{{width:100%;height:100%}}
-.l{{font-size:8pt;color:#66727C;margin-top:2mm}}.c{{font-size:22pt;font-weight:bold;letter-spacing:.12em;font-family:Menlo,monospace}}.b{{font-size:10pt;line-height:1.5}}</style></head>
+.l{{font-size:8pt;color:#66727C;margin-top:2mm}}.c{{font-size:22pt;font-weight:bold;letter-spacing:.12em;font-family:Menlo,monospace}}.b{{font-size:10pt;line-height:1.5}}.nw{{white-space:nowrap}}</style></head>
 <body>{cards}<script>{qr}</script><script>document.querySelectorAll('.qr').forEach(function(e){{var q=qrcode(0,'M');q.addData(e.dataset.u);q.make();e.innerHTML=q.createSvgTag({{cellSize:4,margin:0,scalable:true}});}});</script></body></html>""")
 
     per = {}
