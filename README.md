@@ -8,13 +8,26 @@ Served by GitHub Pages at https://soorathep.github.io/mcare2026/
 - `data/program.json` rooms, sessions, talks, posters (edit this)
 - `src/template.html` page layout and code
 - `src/qrcode.js` QR generator (MIT, Kazuhiko Arase)
-- `tools/build.py` builds `index.html`
+- `data/tasks.json` organizing tasks (team tracker)
+- `src/tasks_template.html` tracker page layout
+- `data/survey.json`, `src/survey_template.html`, `src/results_template.html` feedback survey
+- `worker/` Cloudflare Worker and database schema for survey responses
+- `tools/build.py` builds `index.html`, `tasks.html`, `survey.html` and `results.html`
 
 ## Commands
     python3 tools/build.py --serve    # build and preview at http://localhost:8000
     python3 tools/build.py            # build only
 
 After building, commit and push. The site updates in about a minute.
+
+## Team task tracker
+`https://soorathep.github.io/mcare2026/tasks.html` (not indexed by search engines; anyone with the link can open it)
+
+## Feedback survey
+- Survey: `https://soorathep.github.io/mcare2026/survey.html`
+- Results (admin token): `https://soorathep.github.io/mcare2026/results.html`
+- Questions: `data/survey.json`. Backend: `worker/worker.js` on Cloudflare Workers with a D1 database (`worker/schema.sql`).
+- The live app shows a feedback card from `showInAppFrom` (18 Dec).
 
 ## URLs for QR codes
 - Main: `https://soorathep.github.io/mcare2026/`

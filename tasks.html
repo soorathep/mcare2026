@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1C242B">
+<title>MCARE 2026 Organizing Tasks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0F6E6B;--amber:#E29A2D;--rust:#BE654C;--ink:#1C242B;--graphite:#333F4A;--slate:#66727C;--mist:#B9C1C6;--paper:#F3F0EB;--line:#E6E2DA;--soft:#F7F5F1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.4}
+.wrap{max-width:760px;margin:0 auto;padding:0 0 48px}
+header{background:var(--ink);color:#fff;padding:22px 20px}
+h1{margin:0;font-family:"Space Grotesk",Inter,sans-serif;font-size:28px}
+.sub{font-size:13px;color:#C9D2D6;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:16px 16px 0}
+.stat{background:#fff;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:"Space Grotesk",Inter,sans-serif;font-size:26px}
+.stat span{font-size:12px;color:var(--graphite);font-weight:600}
+.stat.over b{color:var(--rust)}
+.filters{padding:16px 16px 0;display:flex;flex-direction:column;gap:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--mist);background:#fff;font:500 13px Inter,sans-serif;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:0 12px;min-height:44px}
+.search input{flex-grow:1;border:0;background:transparent;font:400 15px Inter,sans-serif;outline:none;min-width:0}
+.sec{padding:22px 20px 8px;display:flex;justify-content:space-between;align-items:baseline}
+.sec h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--graphite)}
+.sec span{font-size:13px;color:var(--graphite)}
+.sec.over h2{color:var(--rust)}
+.list{display:flex;flex-direction:column;gap:8px;padding:0 16px}
+.task{background:#fff;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 2px rgba(28,36,43,.06)}
+.task.over{box-shadow:inset 4px 0 0 var(--rust)}
+.task.done .tt{color:var(--slate);text-decoration:line-through}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tt{font-size:15px;font-weight:600}
+.meta{font-size:12px;color:var(--slate)}
+.meta b{color:var(--ink);font-weight:600}
+.badge{font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.b-todo{border:1px solid var(--mist);color:var(--graphite)}
+.b-doing{background:var(--amber);color:var(--ink)}
+.b-done{background:var(--teal);color:#fff}
+.b-blocked{background:var(--rust);color:#fff}
+.due{font-size:12px;font-weight:600;color:var(--graphite);margin-left:auto}
+.due.over{color:var(--rust)}
+.note{font-size:13px;color:var(--graphite);background:var(--soft);border-radius:8px;padding:6px 10px}
+.id{font-size:11px;color:var(--slate);font-weight:600}
+details{padding:0 16px}
+summary{cursor:pointer;padding:22px 4px 8px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--graphite)}
+details .list{padding:0}
+.empty{padding:24px 20px;text-align:center;color:var(--graphite);font-size:14px}
+footer{padding:28px 20px 0;font-size:12px;color:var(--slate);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>MCARE 2026 Organizing Tasks</h1><div class="sub" id="sub"></div></header>
+<div class="stats" id="stats"></div>
+<div class="filters">
+  <label class="search"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search tasks</span><input type="search" id="q" placeholder="Search task, owner or note" autocomplete="off"></label>
+  <div class="chips" id="cats"></div>
+  <div class="chips" id="owners"></div>
+</div>
+<div id="out"></div>
+<footer>Ask Soorathep to update a task. This page is not listed in search engines but anyone with the link can open it.</footer>
+</div>
+<script id="data" type="application/json">{"updated":"2026-11-15","categories":["Program and slides","Posters","Venue and hotel","Meals and dinners","Student staff","Web app and QR"],"tasks":[{"id":1,"title":"Collect presenters' slides in advance (10 days before the event) and send to the lead organizers","category":"Program and slides","owner":"PCO, KIChE","due":"2026-12-04","status":"todo","note":"PCO collects; KIChE organizers manage afterwards"},{"id":2,"title":"Download presenters' slides before each session and during coffee breaks; check they run","category":"Program and slides","owner":"Student staff","due":"2026-12-14","status":"todo","note":"Recurring, every session"},{"id":3,"title":"Equipment check (computers and audio) 20 minutes before each symposium","category":"Program and slides","owner":"Student staff, Dr. Vipada","due":"2026-12-14","status":"todo","note":"Recurring, every symposium. Problems go to the student staff leader or Dr. Vipada"},{"id":4,"title":"Report speaker no-shows and overtime to the session chair","category":"Program and slides","owner":"Student staff","due":"2026-12-14","status":"todo","note":"On site"},{"id":5,"title":"Check poster board vendor recommendation","category":"Posters","owner":"Hotel","due":null,"status":"todo","note":"54 double-sided panels, 108 boards per session"},{"id":6,"title":"Coordinate poster board installation with the hotel","category":"Posters","owner":"Hotel","due":"2026-12-16","status":"todo","note":"No poster session on Wed 16 Dec (Banquet)"},{"id":7,"title":"Print number stickers and layout maps for 3 poster sessions (prefixes 1-/2-/3-)","category":"Posters","owner":"CU","due":"2026-12-16","status":"todo","note":""},{"id":8,"title":"Print poster score sheets (1.5 times the required quantity)","category":"Posters","owner":"CU","due":"2026-12-16","status":"todo","note":""},{"id":9,"title":"Check availability of the KIChE poster scoring system","category":"Posters","owner":"Prof. Hyunbin Na","due":null,"status":"todo","note":"Prof. Hyunbin Na is on the OC (KIChE)"},{"id":10,"title":"Place the 14 presenters with multiple posters on adjacent boards (A0)","category":"Posters","owner":"Program team","due":"2026-12-10","status":"todo","note":""},{"id":11,"title":"Final check of board installation before each mounting time","category":"Posters","owner":"Student staff leader","due":"2026-12-17","status":"todo","note":"Session 1: Thu 08:30, Session 2: Thu 13:30, Session 3: Fri 08:30"},{"id":12,"title":"Setup, AV rehearsal and on-site student training","category":"Venue and hotel","owner":"All","due":"2026-12-13","status":"todo","note":"Sun 13 Dec"},{"id":13,"title":"Ballroom handover for the Banquet","category":"Venue and hotel","owner":"Hotel","due":"2026-12-16","status":"todo","note":"Wed 16 Dec, 15:40 handover, 19:00 Banquet"},{"id":14,"title":"Staff the cloakroom desk (at least 2 persons; also first aid and lost and found)","category":"Venue and hotel","owner":"Student staff","due":"2026-12-14","status":"todo","note":""},{"id":15,"title":"Confirm lunch venue (restaurant or Pre-function area)","category":"Meals and dinners","owner":"Hotel","due":null,"status":"todo","note":"Pre-function area overlaps with Poster Session 1"},{"id":16,"title":"Confirm the days of the three lunches; include 31 student staff meals and 13 dietary requests","category":"Meals and dinners","owner":"Hotel","due":null,"status":"todo","note":""},{"id":17,"title":"Agree seating capacity and meal-count method with the hotel; assign one person to meal counting","category":"Meals and dinners","owner":"Hotel, Lobby team","due":null,"status":"todo","note":""},{"id":18,"title":"Prepare color-coded meal coupons (3 lunches and the Banquet; general participants and students)","category":"Meals and dinners","owner":"CU","due":"2026-12-11","status":"todo","note":""},{"id":19,"title":"Get hotel venue recommendations for VIP dinners (13, 14, 15, 17 Dec) and the Banquet (16 Dec)","category":"Meals and dinners","owner":"Hotel","due":null,"status":"todo","note":"Fri 18 Dec dinner at Shangri-La"},{"id":20,"title":"Daily student staff briefing","category":"Student staff","owner":"Student staff leader","due":"2026-12-14","status":"todo","note":"Mon 08:30, Tue 08:00, Wed 08:00, Thu 08:30"},{"id":21,"title":"First version of the live program web app with sample data","category":"Web app and QR","owner":"Soorathep","due":"2026-11-15","status":"done","note":"soorathep.github.io/mcare2026"},{"id":22,"title":"Collect team feedback on the web app","category":"Web app and QR","owner":"All","due":"2026-11-20","status":"doing","note":""},{"id":23,"title":"Load the final program (talks, chairs, abstracts, posters) into the web app","category":"Web app and QR","owner":"Soorathep","due":"2026-12-04","status":"todo","note":""},{"id":24,"title":"Print QR signs for the 8 rooms and the main program","category":"Web app and QR","owner":"CU","due":"2026-12-10","status":"todo","note":""},{"id":25,"title":"Confirm TV screens at room entrances for the room display","category":"Web app and QR","owner":"Hotel","due":null,"status":"todo","note":"Optional"},{"id":26,"title":"Set up the feedback survey backend (Cloudflare Worker and D1 database)","category":"Web app and QR","owner":"Soorathep","due":"2026-12-04","status":"todo","note":"Survey page: soorathep.github.io/mcare2026/survey.html"},{"id":27,"title":"Print the feedback survey QR code (closing session slide and posters)","category":"Web app and QR","owner":"CU","due":"2026-12-10","status":"todo","note":""},{"id":28,"title":"Announce the feedback survey at the closing session; keep it open for one week","category":"Web app and QR","owner":"Soorathep","due":"2026-12-18","status":"todo","note":""}]}</script>
+<script>
+(function(){
+"use strict";
+var D = JSON.parse(document.getElementById('data').textContent);
+var LABEL = {todo:'TO DO', doing:'IN PROGRESS', done:'DONE', blocked:'BLOCKED'};
+var st = {cat:'all', owner:'all', q:''};
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function today(){
+  var f = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit'});
+  return f.format(new Date());
+}
+var T = today();
+function addDays(d, n){ var x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0,10); }
+function fmt(d){ return new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', {timeZone:'UTC', weekday:'short', day:'numeric', month:'short'}); }
+function isOver(t){ return t.due && t.due < T && t.status !== 'done'; }
+function ownersOf(){
+  var o = []; D.tasks.forEach(function(t){ t.owner.split(/,\s*/).forEach(function(x){ x = x.trim(); if (x && o.indexOf(x) < 0) o.push(x); }); });
+  return o.sort();
+}
+function chipRow(el, key, items, allLabel){
+  el.innerHTML = '<button type="button" class="chip" data-v="all" aria-pressed="true">' + allLabel + '</button>' + items.map(function(x){ return '<button type="button" class="chip" data-v="' + esc(x) + '" aria-pressed="false">' + esc(x) + '</button>'; }).join('');
+  el.addEventListener('click', function(e){
+    var b = e.target.closest('[data-v]'); if (!b) return; st[key] = b.getAttribute('data-v');
+    Array.prototype.forEach.call(el.children, function(c){ c.setAttribute('aria-pressed', String(c === b)); }); draw();
+  });
+}
+function card(t){
+  var over = isOver(t);
+  return '<div class="task' + (over ? ' over' : '') + (t.status === 'done' ? ' done' : '') + '"><div class="row"><span class="badge b-' + t.status + '">' + LABEL[t.status] + '</span><span class="meta">' + esc(t.category) + '</span>' +
+    '<span class="due' + (over ? ' over' : '') + '">' + (t.due ? (over ? 'Overdue · ' : '') + fmt(t.due) : 'No date') + '</span></div>' +
+    '<div class="tt">' + esc(t.title) + '</div><div class="row"><span class="meta">Owner: <b>' + esc(t.owner) + '</b></span><span class="id">#' + t.id + '</span></div>' +
+    (t.note ? '<div class="note">' + esc(t.note) + '</div>' : '') + '</div>';
+}
+function draw(){
+  var q = st.q.trim().toLowerCase();
+  var L = D.tasks.filter(function(t){
+    if (st.cat !== 'all' && t.category !== st.cat) return false;
+    if (st.owner !== 'all' && t.owner.split(/,\s*/).indexOf(st.owner) < 0) return false;
+    if (q && [t.title, t.owner, t.note, t.category].join(' ').toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  var open = L.filter(function(t){ return t.status !== 'done'; });
+  var wk = addDays(T, 7);
+  var groups = [
+    ['Overdue', open.filter(isOver), 'over'],
+    ['Due in the next 7 days', open.filter(function(t){ return t.due && t.due >= T && t.due <= wk; }), ''],
+    ['Later', open.filter(function(t){ return t.due && t.due > wk; }), ''],
+    ['No date yet', open.filter(function(t){ return !t.due; }), '']
+  ];
+  var by = function(a,b){ return (a.due || '9') < (b.due || '9') ? -1 : (a.due || '9') > (b.due || '9') ? 1 : a.id - b.id; };
+  var h = '';
+  groups.forEach(function(g){ if (!g[1].length) return; g[1].sort(by);
+    h += '<div class="sec ' + g[2] + '"><h2>' + g[0] + '</h2><span>' + g[1].length + '</span></div><div class="list">' + g[1].map(card).join('') + '</div>'; });
+  var done = L.filter(function(t){ return t.status === 'done'; }).sort(by);
+  if (done.length) h += '<details><summary>Done (' + done.length + ')</summary><div class="list">' + done.map(card).join('') + '</div></details>';
+  document.getElementById('out').innerHTML = h || '<div class="empty">No tasks match.</div>';
+  var all = D.tasks;
+  var n = function(f){ return all.filter(f).length; };
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><b>' + n(function(t){ return t.status === 'todo' || t.status === 'blocked'; }) + '</b><span>To do</span></div>' +
+    '<div class="stat"><b>' + n(function(t){ return t.status === 'doing'; }) + '</b><span>In progress</span></div>' +
+    '<div class="stat"><b>' + n(function(t){ return t.status === 'done'; }) + '</b><span>Done</span></div>' +
+    '<div class="stat over"><b>' + n(isOver) + '</b><span>Overdue</span></div>';
+}
+document.getElementById('sub').textContent = 'Last updated ' + fmt(D.updated) + ' · Conference 14–18 Dec 2026 · Today ' + fmt(T);
+chipRow(document.getElementById('cats'), 'cat', D.categories, 'All categories');
+chipRow(document.getElementById('owners'), 'owner', ownersOf(), 'All owners');
+document.getElementById('q').addEventListener('input', function(){ st.q = this.value; draw(); });
+draw();
+})();
+</script>
+</body>
+</html>

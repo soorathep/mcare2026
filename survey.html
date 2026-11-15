@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0F6E6B">
+<title>MCARE 2026 Feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0F6E6B;--amber:#E29A2D;--rust:#BE654C;--ink:#1C242B;--graphite:#333F4A;--slate:#66727C;--mist:#B9C1C6;--paper:#F3F0EB;--line:#E6E2DA;--soft:#F7F5F1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.4}
+.wrap{max-width:600px;margin:0 auto;padding-bottom:40px}
+header{background:var(--teal);color:#fff;padding:22px 20px}
+h1{margin:0;font-family:"Space Grotesk",Inter,sans-serif;font-size:28px}
+header p{margin:8px 0 0;font-size:14px;color:#E6F1F0}
+.prog{position:sticky;top:0;z-index:2;background:var(--paper);padding:10px 16px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);width:0;transition:width .2s}
+.prog span{display:block;font-size:12px;color:var(--graphite);margin-top:4px;text-align:right}
+section{margin:8px 16px 0;background:#fff;border-radius:14px;padding:16px}
+section h2{margin:0 0 4px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+fieldset{border:0;margin:0;padding:14px 0 0;min-width:0}
+fieldset+fieldset{border-top:1px solid var(--line);margin-top:14px}
+legend{font-size:15px;font-weight:600;padding:0;margin-bottom:10px}
+legend .req{color:var(--rust)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{min-height:44px;min-width:44px;padding:0 14px;border-radius:10px;border:1px solid var(--mist);background:#fff;font:500 15px Inter,sans-serif;color:var(--ink);cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+.opt.na{font-size:13px;color:var(--graphite)}
+.opt.na[aria-pressed="true"]{background:var(--graphite);border-color:var(--graphite);color:#fff}
+.rate{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) auto;gap:6px}
+.nps{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px}
+.nps .opt{padding:0;min-width:0;font-size:14px}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--slate);margin-top:6px}
+textarea{width:100%;min-height:88px;border:1px solid var(--mist);border-radius:10px;padding:10px 12px;font:400 15px Inter,sans-serif;color:var(--ink);resize:vertical}
+.err{margin:12px 16px 0;background:#FBEDE8;color:#8A3F2B;border-radius:10px;padding:10px 14px;font-size:14px;display:none}
+.submit{display:block;width:calc(100% - 32px);margin:16px 16px 0;min-height:52px;border:0;border-radius:12px;background:var(--teal);color:#fff;font:700 16px Inter,sans-serif;cursor:pointer}
+.submit:disabled{opacity:.6}
+.note{font-size:12px;color:var(--slate);text-align:center;padding:12px 20px 0}
+.done{margin:24px 16px;background:#fff;border-radius:14px;padding:28px 20px;text-align:center}
+.done h2{font-family:"Space Grotesk",Inter,sans-serif;font-size:24px;margin:0 0 8px}
+.done a{color:var(--teal);font-weight:600}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="data" type="application/json">{"title":"MCARE 2026 Feedback","intro":"Thank you for joining MCARE 2026. This survey takes about 5 minutes and is anonymous.","endpoint":"https://mcare2026-survey.ecs-thailand-election.workers.dev","showInAppFrom":"2026-12-18","sections":[{"title":"About you","questions":[{"id":"role","type":"choice","text":"Your role","options":["Student","Academic","Industry","Government","Other"],"required":true},{"id":"first","type":"choice","text":"Is this your first MCARE?","options":["Yes","No"],"required":true}]},{"title":"Scientific program","questions":[{"id":"plenary","type":"rating","text":"Quality of plenary and keynote lectures"},{"id":"symposia","type":"rating","text":"Relevance and quality of the symposium talks"},{"id":"posters","type":"rating","text":"Poster sessions (format, time, interaction)"}]},{"title":"Organization","questions":[{"id":"registration","type":"rating","text":"Registration and on-site help"},{"id":"timekeeping","type":"rating","text":"Time keeping and session chairing"},{"id":"information","type":"rating","text":"Information and signage, including the live program web app"}]},{"title":"Venue and hospitality","questions":[{"id":"rooms","type":"rating","text":"Meeting rooms and audio-visual equipment"},{"id":"meals","type":"rating","text":"Lunches and coffee breaks"},{"id":"banquet","type":"rating","text":"Banquet"}]},{"title":"Overall","questions":[{"id":"overall","type":"rating","text":"Overall satisfaction with MCARE 2026","na":false,"required":true},{"id":"nps","type":"nps","text":"How likely are you to recommend MCARE to a colleague?","required":true}]},{"title":"Comments","questions":[{"id":"best","type":"text","text":"What did you value most? (optional)"},{"id":"improve","type":"text","text":"One thing we should improve next time (optional)"}]}]}</script>
+<script>
+(function(){
+"use strict";
+var S = JSON.parse(document.getElementById('data').textContent);
+var KEY = 'mcare2026-survey-sent';
+var ans = {};
+var app = document.getElementById('app');
+var Q = []; S.sections.forEach(function(s){ s.questions.forEach(function(q){ Q.push(q); }); });
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function sent(){ try { return localStorage.getItem(KEY) === '1'; } catch(e){ return false; } }
+function thanks(){
+  app.innerHTML = '<header><h1>' + esc(S.title) + '</h1></header><div class="done"><h2>Thank you</h2><p>Your feedback has been received. It helps us plan the next MCARE.</p><p><a href="./">Back to the live program</a></p></div>';
+  window.scrollTo(0, 0);
+}
+if (sent() && !/[?&]again=1/.test(location.search)) { thanks(); return; }
+
+function btn(qid, val, label, cls){ return '<button type="button" class="opt' + (cls ? ' ' + cls : '') + '" data-q="' + qid + '" data-v="' + esc(JSON.stringify(val)) + '" aria-pressed="false">' + esc(label) + '</button>'; }
+var h = '<header><h1>' + esc(S.title) + '</h1><p>' + esc(S.intro) + '</p></header><div class="prog"><div class="bar"><i id="pb"></i></div><span id="pt"></span></div>';
+S.sections.forEach(function(s){
+  h += '<section><h2>' + esc(s.title) + '</h2>';
+  s.questions.forEach(function(q){
+    h += '<fieldset id="f-' + q.id + '"><legend>' + esc(q.text) + (q.required ? ' <span class="req" aria-label="required">*</span>' : '') + '</legend>';
+    if (q.type === 'choice') h += '<div class="opts">' + q.options.map(function(o){ return btn(q.id, o, o); }).join('') + '</div>';
+    if (q.type === 'rating') h += '<div class="rate">' + [1,2,3,4,5].map(function(n){ return btn(q.id, n, n); }).join('') + (q.na === false ? '' : btn(q.id, 'na', 'N/A', 'na')) + '</div><div class="scale"><span>1 Poor</span><span>5 Excellent</span></div>';
+    if (q.type === 'nps') h += '<div class="nps">' + [0,1,2,3,4,5,6,7,8,9,10].map(function(n){ return btn(q.id, n, n); }).join('') + '</div><div class="scale"><span>0 Not likely</span><span>10 Very likely</span></div>';
+    if (q.type === 'text') h += '<label class="sr" for="t-' + q.id + '">' + esc(q.text) + '</label><textarea id="t-' + q.id + '" data-text="' + q.id + '" maxlength="2000"></textarea>';
+    h += '</fieldset>';
+  });
+  h += '</section>';
+});
+h += '<div class="err" id="err" role="alert"></div><button type="button" class="submit" id="send">Submit feedback</button><p class="note">Anonymous. No name, email or device information is stored.</p>';
+app.innerHTML = h;
+
+function progress(){
+  var n = Q.filter(function(q){ return q.type !== 'text'; }), d = n.filter(function(q){ return ans[q.id] !== undefined; }).length;
+  document.getElementById('pb').style.width = Math.round(100 * d / n.length) + '%';
+  document.getElementById('pt').textContent = d + ' of ' + n.length + ' answered';
+}
+app.addEventListener('click', function(e){
+  var b = e.target.closest('[data-q]'); if (!b) return;
+  var q = b.getAttribute('data-q'); ans[q] = JSON.parse(b.getAttribute('data-v'));
+  document.querySelectorAll('[data-q="' + q + '"]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+  progress();
+});
+app.addEventListener('input', function(e){ var t = e.target.getAttribute('data-text'); if (t) ans[t] = e.target.value; });
+progress();
+
+document.getElementById('send').addEventListener('click', function(){
+  var err = document.getElementById('err');
+  var miss = Q.filter(function(q){ return q.required && ans[q.id] === undefined; });
+  if (miss.length) {
+    err.textContent = 'Please answer: ' + miss.map(function(q){ return q.text; }).join('; ');
+    err.style.display = 'block'; document.getElementById('f-' + miss[0].id).scrollIntoView({behavior:'smooth', block:'center'}); return;
+  }
+  if (!S.endpoint) { err.textContent = 'Preview only: the survey is not connected to the database yet.'; err.style.display = 'block'; return; }
+  var b = this; b.disabled = true; b.textContent = 'Sending...'; err.style.display = 'none';
+  var body = {}; Object.keys(ans).forEach(function(k){ var v = ans[k]; if (typeof v === 'string') v = v.trim(); if (v !== '') body[k] = v; });
+  fetch(S.endpoint.replace(/\/$/, '') + '/submit', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)})
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); }); })
+    .then(function(){ try { localStorage.setItem(KEY, '1'); } catch(e){} thanks(); })
+    .catch(function(x){ err.textContent = 'Could not send your feedback (' + x.message + '). Please check your connection and try again.'; err.style.display = 'block'; b.disabled = false; b.textContent = 'Submit feedback'; });
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MCARE 2026 Feedback Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0F6E6B;--amber:#E29A2D;--rust:#BE654C;--ink:#1C242B;--graphite:#333F4A;--slate:#66727C;--mist:#B9C1C6;--paper:#F3F0EB;--line:#E6E2DA;--soft:#F7F5F1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.4}
+.wrap{max-width:820px;margin:0 auto;padding-bottom:40px}
+header{background:var(--ink);color:#fff;padding:22px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-family:"Space Grotesk",Inter,sans-serif;font-size:26px}
+.login{margin:24px 16px;background:#fff;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px}
+input{min-height:44px;border:1px solid var(--mist);border-radius:10px;padding:0 12px;font:400 15px Inter,sans-serif}
+button{min-height:44px;border:0;border-radius:10px;background:var(--teal);color:#fff;font:600 15px Inter,sans-serif;padding:0 16px;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--mist)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 0}
+.kpi{background:#fff;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:"Space Grotesk",Inter,sans-serif;font-size:30px}
+.kpi span{font-size:12px;font-weight:600;color:var(--graphite)}
+.card{margin:12px 16px 0;background:#fff;border-radius:14px;padding:16px}
+.card h2{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--graphite)}
+.r{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 64px;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.r:first-of-type{border-top:0}
+.track{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--teal)}
+.r b{text-align:right;font-variant-numeric:tabular-nums}
+.r small{display:block;color:var(--slate);font-size:12px}
+.sec{font-size:12px;font-weight:700;color:var(--teal);padding:12px 0 2px;text-transform:uppercase;letter-spacing:.05em}
+.c{padding:10px 0;border-top:1px solid var(--line);font-size:14px;white-space:pre-wrap}
+.c:first-of-type{border-top:0}
+.msg{margin:16px;color:var(--graphite);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="data" type="application/json">/*SURVEY*/</script>
+<script>
+(function(){
+"use strict";
+var S = JSON.parse(document.getElementById('data').textContent);
+var app = document.getElementById('app');
+var TK = 'mcare2026-admin';
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function login(msg){
+  app.innerHTML = '<header><h1>Feedback results</h1></header><div class="login"><label for="tok"><b>Admin token</b></label><input id="tok" type="password" autocomplete="off"><button id="go">Show results</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</div>';
+  document.getElementById('go').onclick = function(){ var t = document.getElementById('tok').value.trim(); if (t) load(t); };
+}
+function load(tok){
+  if (!S.endpoint) return login('The survey is not connected to the database yet.');
+  app.innerHTML = '<div class="msg">Loading...</div>';
+  fetch(S.endpoint.replace(/\/$/, '') + '/results', {headers:{Authorization:'Bearer ' + tok}})
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j.responses; }); })
+    .then(function(R){ try { sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
+    .catch(function(e){ try { sessionStorage.removeItem(TK); } catch(x){} login('Could not load: ' + e.message); });
+}
+function show(R){
+  var n = R.length;
+  var nps = R.filter(function(r){ return typeof r.nps === 'number'; });
+  var npsScore = nps.length ? Math.round(100 * (nps.filter(function(r){ return r.nps >= 9; }).length - nps.filter(function(r){ return r.nps <= 6; }).length) / nps.length) : null;
+  var ov = R.filter(function(r){ return typeof r.overall === 'number'; });
+  var ovMean = ov.length ? (ov.reduce(function(a,r){ return a + r.overall; }, 0) / ov.length) : null;
+  var h = '<header><h1>Feedback results</h1><span style="display:flex;gap:8px"><button class="ghost" id="csv">Download CSV</button><button class="ghost" id="out">Sign out</button></span></header>';
+  h += '<div class="kpis"><div class="kpi"><b>' + n + '</b><span>Responses</span></div><div class="kpi"><b>' + (ovMean == null ? '–' : ovMean.toFixed(2)) + '</b><span>Overall (1 to 5)</span></div><div class="kpi"><b>' + (npsScore == null ? '–' : npsScore) + '</b><span>Net Promoter Score (-100 to 100)</span></div></div>';
+  h += '<div class="card"><h2>Ratings (mean, 1 to 5)</h2>';
+  S.sections.forEach(function(s){
+    var qs = s.questions.filter(function(q){ return q.type === 'rating'; }); if (!qs.length) return;
+    h += '<div class="sec">' + esc(s.title) + '</div>';
+    qs.forEach(function(q){
+      var v = R.map(function(r){ return r[q.id]; }).filter(function(x){ return typeof x === 'number'; });
+      var na = R.filter(function(r){ return r[q.id] === 'na'; }).length;
+      var m = v.length ? v.reduce(function(a,b){ return a + b; }, 0) / v.length : 0;
+      h += '<div class="r"><span>' + esc(q.text) + '<small>' + v.length + ' rated' + (na ? ' · ' + na + ' N/A' : '') + '</small></span><div class="track"><i style="width:' + (m / 5 * 100) + '%"></i></div><b>' + (v.length ? m.toFixed(2) : '–') + '</b></div>';
+    });
+  });
+  h += '</div>';
+  S.sections.forEach(function(s){ s.questions.filter(function(q){ return q.type === 'choice'; }).forEach(function(q){
+    h += '<div class="card"><h2>' + esc(q.text) + '</h2>';
+    q.options.forEach(function(o){ var c = R.filter(function(r){ return r[q.id] === o; }).length;
+      h += '<div class="r"><span>' + esc(o) + '</span><div class="track"><i style="width:' + (n ? 100 * c / n : 0) + '%"></i></div><b>' + c + '</b></div>'; });
+    h += '</div>';
+  }); });
+  S.sections.forEach(function(s){ s.questions.filter(function(q){ return q.type === 'text'; }).forEach(function(q){
+    var c = R.filter(function(r){ return r[q.id]; });
+    h += '<div class="card"><h2>' + esc(q.text) + ' · ' + c.length + '</h2>' + (c.length ? c.map(function(r){ return '<div class="c">' + esc(r[q.id]) + '</div>'; }).join('') : '<div class="c" style="color:var(--slate)">No comments yet.</div>') + '</div>';
+  }); });
+  app.innerHTML = h;
+  document.getElementById('out').onclick = function(){ try { sessionStorage.removeItem(TK); } catch(e){} login(); };
+  document.getElementById('csv').onclick = function(){
+    var cols = ['id', 'created_at']; S.sections.forEach(function(s){ s.questions.forEach(function(q){ cols.push(q.id); }); });
+    var cell = function(v){ v = v == null ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var csv = '﻿' + cols.join(',') + '\n' + R.map(function(r){ return cols.map(function(c){ return cell(r[c]); }).join(','); }).join('\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'mcare2026_feedback.csv'; a.click();
+  };
+}
+var saved = null; try { saved = sessionStorage.getItem(TK); } catch(e){}
+if (saved) load(saved); else login();
+})();
+</script>
+</body>
+</html>

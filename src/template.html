@@ -289,8 +289,9 @@ function viewNow(){
   if (st !== 'on') {
     var msg = st === 'after' ? 'MCARE 2026 has ended. Thank you for joining us.' :
       'MCARE 2026 runs from ' + fmtDay(D.meta.days[0], {day:'numeric'}) + ' to ' + fmtDay(D.meta.days[D.meta.days.length-1], {day:'numeric', month:'long', year:'numeric'}) + '. This page shows live sessions during the conference.';
-    return shell(h + '<div class="stack" style="padding-top:16px"><div class="card"><div style="font-size:15px">' + esc(msg) + '</div><a class="link" href="' + href({view:'schedule'}) + '">Browse the full program</a></div></div>', 'now');
+    return shell(h + (st === 'after' && D.meta.surveyFrom ? surveyCard() : '') + '<div class="stack" style="padding-top:16px"><div class="card"><div style="font-size:15px">' + esc(msg) + '</div><a class="link" href="' + href({view:'schedule'}) + '">Browse the full program</a></div></div>', 'now');
   }
+  if (D.meta.surveyFrom && now.day >= D.meta.surveyFrom) h += surveyCard();
   (D.announcements || []).forEach(function(a){
     if (a.day === now.day && mm(a.start) <= now.min && now.min < mm(a.end)) h += '<div class="notice">' + IC.mega + '<span>' + esc(a.text) + '</span></div>';
   });
@@ -353,6 +354,10 @@ function viewNow(){
     h += '</div>';
   }
   return shell(h, 'now');
+}
+
+function surveyCard(){
+  return '<div class="stack" style="padding-top:16px"><a class="card" href="survey.html" style="border:2px solid var(--amber)"><span class="rname">Share your feedback</span><span style="font-size:14px">A 5-minute anonymous survey. It helps us plan the next MCARE.</span><span class="link">Start the survey</span></a></div>';
 }
 
 /* ---------- ROOM ---------- */
