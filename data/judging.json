@@ -1,0 +1,11 @@
+{
+ "title": "MCARE 2026 Poster Judging",
+ "judgesPerPoster": 2,
+ "criteria": [
+  {"id": "science", "name": "Scientific quality", "desc": "Soundness of methods, data and conclusions"},
+  {"id": "novelty", "name": "Novelty and significance", "desc": "Originality and potential impact of the work"},
+  {"id": "clarity", "name": "Poster clarity", "desc": "Layout, figures and readability"},
+  {"id": "qa", "name": "Explanation and Q&A", "desc": "How well the presenter explains the work and answers questions"}
+ ],
+ "scale": [1, 10]
+}

@@ -26,6 +26,7 @@ def build():
     open(p("index.html"), "w", encoding="utf-8").write(out)
     build_tasks()
     build_survey()
+    build_judging(data)
     print(f"Built index.html ({len(out)//1024} KB): {len(data['sessions'])} sessions, "
           f"{len(data['talks'])} talks, {len(data['posters'])} posters")
 
@@ -55,6 +56,25 @@ def build_survey():
         tpl = open(p("src", src), encoding="utf-8").read()
         open(p(out), "w", encoding="utf-8").write(tpl.replace("/*SURVEY*/", js))
     print(f"Built survey.html and results.html: {len(ids)} questions, endpoint {'set' if sv.get('endpoint') else 'NOT SET (preview only)'}")
+
+def build_judging(program):
+    path = p("data", "judging.json")
+    if not os.path.exists(path): return
+    cfg = json.load(open(path, encoding="utf-8"))
+    ids = [c["id"] for c in cfg["criteria"]]
+    import re
+    if len(ids) != len(set(ids)) or not all(re.fullmatch(r"[a-z_]{1,24}", i) for i in ids):
+        sys.exit("judging.json: criterion ids must be unique, lowercase letters or _ only")
+    endpoint = json.load(open(p("data", "survey.json"), encoding="utf-8")).get("endpoint", "") if os.path.exists(p("data", "survey.json")) else ""
+    import datetime
+    sessions = [dict(s, dayLabel=datetime.date.fromisoformat(s["day"]).strftime("%a %d %b")) for s in program["posterSessions"]]
+    payload = {"config": cfg, "endpoint": endpoint, "panelsPerRow": program["meta"].get("panelsPerRow", 9), "posterSessions": sessions,
+               "posters": [{k: x[k] for k in ("board", "session", "title", "presenter", "affil", "symposium")} for x in program["posters"]]}
+    js = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    for src, out in (("judge_template.html", "judge.html"), ("poster_results_template.html", "poster-results.html")):
+        tpl = open(p("src", src), encoding="utf-8").read()
+        open(p(out), "w", encoding="utf-8").write(tpl.replace("/*JUDGING*/", js))
+    print(f"Built judge.html and poster-results.html: {len(ids)} criteria, {len(payload['posters'])} posters")
 
 def serve(port=8000):
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=ROOT)

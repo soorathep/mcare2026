@@ -48,16 +48,22 @@ var app = document.getElementById('app');
 var TK = 'mcare2026-admin';
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function login(msg){
-  app.innerHTML = '<header><h1>Feedback results</h1></header><div class="login"><label for="tok"><b>Admin token</b></label><input id="tok" type="password" autocomplete="off"><button id="go">Show results</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</div>';
-  document.getElementById('go').onclick = function(){ var t = document.getElementById('tok').value.trim(); if (t) load(t); };
+  app.innerHTML = '<header><h1>Feedback results</h1></header><form class="login" id="lf" method="post" action="#">' +
+    '<input type="text" name="username" autocomplete="username" value="mcare2026-admin" readonly style="display:none">' +
+    '<label for="tok"><b>Admin token</b></label><input id="tok" name="password" type="password" autocomplete="current-password">' +
+    '<label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" id="rem" checked style="width:20px;height:20px;min-height:0"> Remember on this device</label>' +
+    '<button type="submit">Show results</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</form>';
+  document.getElementById('lf').onsubmit = function(e){ e.preventDefault(); var t = document.getElementById('tok').value.trim(); if (t) load(t, document.getElementById('rem').checked); };
 }
-function load(tok){
+function store(){ try { return localStorage.getItem(TK) ? localStorage : sessionStorage; } catch(e){ return null; } }
+function forget(){ try { localStorage.removeItem(TK); sessionStorage.removeItem(TK); } catch(e){} }
+function load(tok, remember){
   if (!S.endpoint) return login('The survey is not connected to the database yet.');
   app.innerHTML = '<div class="msg">Loading...</div>';
   fetch(S.endpoint.replace(/\/$/, '') + '/results', {headers:{Authorization:'Bearer ' + tok}})
     .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j.responses; }); })
-    .then(function(R){ try { sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
-    .catch(function(e){ try { sessionStorage.removeItem(TK); } catch(x){} login('Could not load: ' + e.message); });
+    .then(function(R){ try { if (remember === true) localStorage.setItem(TK, tok); else if (remember === false) sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
+    .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Wrong token. Please try again.' : 'Could not load: ' + e.message); });
 }
 function show(R){
   var n = R.length;
@@ -90,7 +96,7 @@ function show(R){
     h += '<div class="card"><h2>' + esc(q.text) + ' · ' + c.length + '</h2>' + (c.length ? c.map(function(r){ return '<div class="c">' + esc(r[q.id]) + '</div>'; }).join('') : '<div class="c" style="color:var(--slate)">No comments yet.</div>') + '</div>';
   }); });
   app.innerHTML = h;
-  document.getElementById('out').onclick = function(){ try { sessionStorage.removeItem(TK); } catch(e){} login(); };
+  document.getElementById('out').onclick = function(){ forget(); login(); };
   document.getElementById('csv').onclick = function(){
     var cols = ['id', 'created_at']; S.sections.forEach(function(s){ s.questions.forEach(function(q){ cols.push(q.id); }); });
     var cell = function(v){ v = v == null ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
@@ -98,7 +104,7 @@ function show(R){
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'mcare2026_feedback.csv'; a.click();
   };
 }
-var saved = null; try { saved = sessionStorage.getItem(TK); } catch(e){}
+var saved = null; try { saved = localStorage.getItem(TK) || sessionStorage.getItem(TK); } catch(e){}
 if (saved) load(saved); else login();
 })();
 </script>

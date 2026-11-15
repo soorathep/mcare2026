@@ -653,6 +653,8 @@ function viewPoster(){
   h += '<div class="dl"><div><span>Session</span><span>' + esc(shortDay(p.day)) + ' · on display ' + p.display[0] + '–' + p.display[1] + '</span></div><div><span>Presenter at board</span><span>' + p.core[0] + '–' + p.core[1] + '<br><span class="muted" style="font-weight:400">Core time</span></span></div><div><span>Where</span><span>' + esc(D.meta.posterArea) + ' · Row ' + rowOf(x.board) + ', panel ' + panelOf(x.board) + '</span></div></div>';
   h += '<div class="stack" style="padding-top:12px"><a class="card" href="' + href({map: p.id, b: x.board}) + '" style="flex-direction:row;align-items:center;gap:14px"><span style="display:flex;flex-direction:column;gap:3px"><b style="font-size:14px">Find this poster</b><span class="meta" style="font-size:13px">Row ' + rowOf(x.board) + ', panel ' + panelOf(x.board) + ', ' + faceOf(x.board) + '</span><span class="link">Show on floor map</span></span></a></div>';
   h += '<div class="btns" style="margin:12px 16px 0">' + saveBtn('p:' + x.board).replace('class="btn"', 'class="btn pri"') + '<button type="button" class="btn" data-share="1">' + IC.share + 'Share</button></div>';
+  var jc = null; try { jc = localStorage.getItem('mcare2026-judge'); } catch(e){}
+  if (jc) h += '<div style="margin:12px 16px 0"><a class="btn" style="background:var(--ink);border-color:var(--ink);color:#fff" href="judge.html?b=' + encodeURIComponent(x.board) + '">Score this poster (judges)</a></div>';
   h += '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml(x.abstract) + '</div>';
   return shell(h, 'now');
 }

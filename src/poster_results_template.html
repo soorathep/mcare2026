@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MCARE 2026 Poster Judging Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0F6E6B;--amber:#E29A2D;--rust:#BE654C;--ink:#1C242B;--graphite:#333F4A;--slate:#66727C;--mist:#B9C1C6;--paper:#F3F0EB;--line:#E6E2DA;--soft:#F7F5F1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.4}
+.wrap{max-width:1100px;margin:0 auto;padding-bottom:40px}
+header{background:var(--ink);color:#fff;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-family:"Space Grotesk",Inter,sans-serif;font-size:24px}
+form,.card{margin:16px;background:#fff;border-radius:14px;padding:16px}
+form{display:flex;flex-direction:column;gap:10px;max-width:560px}
+input{min-height:44px;border:1px solid var(--mist);border-radius:10px;padding:0 12px;font:400 15px Inter,sans-serif}
+button{min-height:40px;border:0;border-radius:10px;background:var(--teal);color:#fff;font:600 14px Inter,sans-serif;padding:0 14px;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--mist)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:16px 16px 0}
+.kpi{background:#fff;border-radius:12px;padding:14px}.kpi b{display:block;font-family:"Space Grotesk",Inter,sans-serif;font-size:28px}.kpi span{font-size:12px;font-weight:600;color:var(--graphite)}
+.tabs{display:flex;gap:8px;padding:16px 16px 0;flex-wrap:wrap}
+.tab{background:#fff;color:var(--ink);border:1px solid var(--mist)}.tab[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card h2{margin:0 0 4px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--graphite)}
+.note{font-size:12px;color:var(--slate);margin:0 0 10px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 10px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--graphite);border-top:0;white-space:nowrap}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.top td{background:#FBF6EA}
+.rk{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:15px}
+.warn{color:var(--rust);font-weight:600}
+.msg{margin:16px;color:var(--graphite);font-size:14px}
+.err{color:#8A3F2B;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="data" type="application/json">/*JUDGING*/</script>
+<script>
+(function(){
+"use strict";
+var D = JSON.parse(document.getElementById('data').textContent);
+var CR = D.config.criteria, NEED = D.config.judgesPerPoster || 2;
+var P = {}; D.posters.forEach(function(p){ P[p.board] = p; });
+var TK = 'mcare2026-admin', app = document.getElementById('app'), cur = String(D.posterSessions[0].id), DATA = null;
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function forget(){ try { localStorage.removeItem(TK); sessionStorage.removeItem(TK); } catch(e){} }
+function login(msg){
+  app.innerHTML = '<header><h1>Poster judging results</h1></header><form id="lf"><input type="text" name="username" autocomplete="username" value="mcare2026-admin" readonly style="display:none"><label for="tok"><b>Admin token</b></label><input id="tok" name="password" type="password" autocomplete="current-password"><label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="rem" checked style="width:20px;height:20px;min-height:0"> Remember on this device</label><button type="submit">Show results</button>' + (msg ? '<div class="err">' + esc(msg) + '</div>' : '') + '</form>';
+  document.getElementById('lf').onsubmit = function(e){ e.preventDefault(); var t = document.getElementById('tok').value.trim(); if (t) load(t, document.getElementById('rem').checked); };
+}
+function load(tok, remember){
+  if (!D.endpoint) return login('Not connected to the database yet.');
+  app.innerHTML = '<div class="msg">Loading...</div>';
+  fetch(D.endpoint.replace(/\/$/, '') + '/poster-results', {headers: {Authorization: 'Bearer ' + tok}})
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j; }); })
+    .then(function(j){ try { if (remember === true) localStorage.setItem(TK, tok); else if (remember === false) sessionStorage.setItem(TK, tok); } catch(e){} DATA = j; show(); })
+    .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Wrong token. Please try again.' : 'Could not load: ' + e.message); });
+}
+function mean(a){ return a.length ? a.reduce(function(x, y){ return x + y; }, 0) / a.length : null; }
+function fmt(v, d){ return v == null ? '–' : v.toFixed(d == null ? 1 : d); }
+function show(){
+  var J = DATA.judges, S = DATA.scores, JN = {};
+  J.forEach(function(j){ JN[j.code] = j.name; });
+  // judge strictness: z-score of each judge's totals
+  var jst = {};
+  J.forEach(function(j){ var t = S.filter(function(s){ return s.judge_code === j.code; }).map(function(s){ return s.total; }); var m = mean(t);
+    var sd = t.length > 1 ? Math.sqrt(t.reduce(function(a, x){ return a + (x - m) * (x - m); }, 0) / (t.length - 1)) : 0; jst[j.code] = {m: m, sd: sd}; });
+  var assigned = {}; J.forEach(function(j){ j.boards.forEach(function(b){ (assigned[b] = assigned[b] || []).push(j.code); }); });
+  var totalAssign = J.reduce(function(a, j){ return a + j.boards.length; }, 0);
+  var h = '<header><h1>Poster judging results</h1><span style="display:flex;gap:8px"><button class="ghost" id="rf">Refresh</button><button class="ghost" id="csv">Download CSV</button><button class="ghost" id="out">Sign out</button></span></header>';
+  h += '<div class="kpis"><div class="kpi"><b>' + S.length + ' / ' + totalAssign + '</b><span>Scores received / assigned</span></div><div class="kpi"><b>' + J.length + '</b><span>Judges</span></div><div class="kpi"><b>' + Object.keys(assigned).length + '</b><span>Posters assigned</span></div><div class="kpi"><b>' + Object.keys(assigned).filter(function(b){ return S.filter(function(s){ return s.board === b; }).length >= Math.min(NEED, assigned[b].length); }).length + '</b><span>Posters fully judged</span></div></div>';
+  h += '<div class="tabs">' + D.posterSessions.map(function(s){ return '<button class="tab" data-s="' + s.id + '" aria-pressed="' + (String(s.id) === cur) + '">Session ' + s.id + '</button>'; }).join('') + '<button class="tab" data-s="judges" aria-pressed="' + (cur === 'judges') + '">Judge progress</button></div>';
+  if (cur === 'judges') {
+    h += '<div class="card"><h2>Judge progress</h2><div class="tw"><table><tr><th>Judge</th><th>Code</th><th class="n">Scored</th><th class="n">Assigned</th><th class="n">Mean total</th><th>Boards still to score</th></tr>';
+    J.forEach(function(j){ var mineB = S.filter(function(s){ return s.judge_code === j.code; }).map(function(s){ return s.board; });
+      var left = j.boards.filter(function(b){ return mineB.indexOf(b) < 0; });
+      h += '<tr><td>' + esc(j.name) + '</td><td>' + esc(j.code) + '</td><td class="n">' + mineB.length + '</td><td class="n">' + j.boards.length + '</td><td class="n">' + fmt(jst[j.code].m) + '</td><td>' + (left.length ? esc(left.join(', ')) : '<span style="color:var(--teal);font-weight:600">Done</span>') + '</td></tr>'; });
+    h += '</table></div></div>';
+  } else {
+    var rows = D.posters.filter(function(p){ return String(p.session) === cur && assigned[p.board]; }).map(function(p){
+      var ss = S.filter(function(s){ return s.board === p.board; });
+      var r = {p: p, n: ss.length, need: Math.min(NEED, assigned[p.board].length), total: mean(ss.map(function(s){ return s.total; })),
+        z: mean(ss.map(function(s){ var st = jst[s.judge_code]; return st.sd > 0 ? (s.total - st.m) / st.sd : 0; })), crit: {}, judges: ss.map(function(s){ return JN[s.judge_code] + ' (' + s.total + ')'; }).join(', ')};
+      CR.forEach(function(c){ r.crit[c.id] = mean(ss.map(function(s){ return s.scores[c.id]; }).filter(function(v){ return typeof v === 'number'; })); });
+      return r; });
+    rows.sort(function(a, b){ return (b.total == null ? -1 : b.total) - (a.total == null ? -1 : a.total) || (b.z || 0) - (a.z || 0); });
+    var rank = 0, last = null;
+    h += '<div class="card"><h2>Session ' + cur + ' ranking</h2><p class="note">Ranked by mean total. "Adj." is the mean z-score after adjusting for each judge\'s strictness; use it to check close calls. Rows in red still need scores.</p><div class="tw"><table><tr><th>Rank</th><th>Board</th><th>Poster</th><th>Sym.</th>' + CR.map(function(c){ return '<th class="n" title="' + esc(c.name) + '">' + esc(c.name.split(' ')[0]) + '</th>'; }).join('') + '<th class="n">Total</th><th class="n">Adj.</th><th class="n">Judges</th></tr>';
+    rows.forEach(function(r, i){
+      if (r.total !== last) { rank = i + 1; last = r.total; }
+      var inc = r.n < r.need;
+      h += '<tr class="' + (rank <= 3 && r.total != null && !inc ? 'top' : '') + '"><td class="rk">' + (r.total == null ? '–' : rank) + '</td><td><b>' + esc(r.p.board) + '</b></td><td>' + esc(r.p.title) + '<br><span style="color:var(--slate)">' + esc(r.p.presenter) + ' · ' + esc(r.p.affil) + '</span><br><span style="color:var(--slate);font-size:12px">' + esc(r.judges) + '</span></td><td>' + esc(r.p.symposium) + '</td>' +
+        CR.map(function(c){ return '<td class="n">' + fmt(r.crit[c.id]) + '</td>'; }).join('') + '<td class="n"><b>' + fmt(r.total) + '</b></td><td class="n">' + fmt(r.z, 2) + '</td><td class="n' + (inc ? ' warn' : '') + '">' + r.n + ' / ' + r.need + '</td></tr>';
+    });
+    h += '</table></div></div>';
+  }
+  app.innerHTML = h;
+  app.querySelectorAll('[data-s]').forEach(function(b){ b.onclick = function(){ cur = b.getAttribute('data-s'); show(); }; });
+  document.getElementById('out').onclick = function(){ forget(); login(); };
+  document.getElementById('rf').onclick = function(){ var t = null; try { t = localStorage.getItem(TK) || sessionStorage.getItem(TK); } catch(e){} if (t) load(t); };
+  document.getElementById('csv').onclick = function(){
+    var cols = ['session', 'board', 'title', 'presenter', 'symposium', 'judge', 'judge_code'].concat(CR.map(function(c){ return c.id; })).concat(['total', 'comment', 'updated_at']);
+    var cell = function(v){ v = v == null ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var lines = S.map(function(s){ var p = P[s.board] || {}; var row = {session: p.session, board: s.board, title: p.title, presenter: p.presenter, symposium: p.symposium, judge: JN[s.judge_code], judge_code: s.judge_code, total: s.total, comment: s.comment, updated_at: s.updated_at};
+      CR.forEach(function(c){ row[c.id] = s.scores[c.id]; }); return cols.map(function(c){ return cell(row[c]); }).join(','); });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + cols.join(',') + '\n' + lines.join('\n')], {type: 'text/csv'})); a.download = 'mcare2026_poster_scores.csv'; a.click();
+  };
+}
+var saved = null; try { saved = localStorage.getItem(TK) || sessionStorage.getItem(TK); } catch(e){}
+if (saved) load(saved); else login();
+})();
+</script>
+</body>
+</html>

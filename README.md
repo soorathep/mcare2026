@@ -11,7 +11,9 @@ Served by GitHub Pages at https://soorathep.github.io/mcare2026/
 - `data/tasks.json` organizing tasks (team tracker)
 - `src/tasks_template.html` tracker page layout
 - `data/survey.json`, `src/survey_template.html`, `src/results_template.html` feedback survey
-- `worker/` Cloudflare Worker and database schema for survey responses
+- `data/judging.json`, `src/judge_template.html`, `src/poster_results_template.html` poster judging
+- `worker/` Cloudflare Worker and database schema (survey and poster judging)
+- `tools/make_judges.py` assigns judges, creates codes and judge cards (output in `private/`)
 - `tools/build.py` builds `index.html`, `tasks.html`, `survey.html` and `results.html`
 
 ## Commands
@@ -28,6 +30,13 @@ After building, commit and push. The site updates in about a minute.
 - Results (admin token): `https://soorathep.github.io/mcare2026/results.html`
 - Questions: `data/survey.json`. Backend: `worker/worker.js` on Cloudflare Workers with a D1 database (`worker/schema.sql`).
 - The live app shows a feedback card from `showInAppFrom` (18 Dec).
+
+## Poster judging
+- Judges: `https://soorathep.github.io/mcare2026/judge.html` (log in with the code or QR on the judge card)
+- Results (admin token): `https://soorathep.github.io/mcare2026/poster-results.html`, ranking per poster session
+- Criteria: `data/judging.json` (can change any time; no Worker or database change needed)
+- Judges: put `name,session` rows in `private/judges.csv`, run `python3 tools/make_judges.py`, paste `private/judges_seed.sql` into the D1 Console, print `private/judge_cards.html`
+- `private/` is in `.gitignore`: judge codes never go to GitHub
 
 ## URLs for QR codes
 - Main: `https://soorathep.github.io/mcare2026/`

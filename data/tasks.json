@@ -88,7 +88,7 @@
    "owner": "Prof. Hyunbin Na",
    "due": null,
    "status": "todo",
-   "note": "Prof. Hyunbin Na is on the OC (KIChE)"
+   "note": "Our own judging system is the main system (judge.html); paper score sheets as backup"
   },
   {
    "id": 10,
@@ -260,6 +260,42 @@
    "due": "2026-12-18",
    "status": "todo",
    "note": ""
+  },
+  {
+   "id": 29,
+   "title": "Finalize poster judging criteria",
+   "category": "Posters",
+   "owner": "Program team",
+   "due": "2026-12-04",
+   "status": "todo",
+   "note": "Edit data/judging.json; no code change needed"
+  },
+  {
+   "id": 30,
+   "title": "Send the judge list for each poster session (name, session)",
+   "category": "Posters",
+   "owner": "Program team",
+   "due": "2026-12-07",
+   "status": "todo",
+   "note": "About 9 judges per session keeps each judge near 24 posters in a 2-hour core time"
+  },
+  {
+   "id": 31,
+   "title": "Load judges into the database and print judge cards",
+   "category": "Posters",
+   "owner": "Soorathep",
+   "due": "2026-12-10",
+   "status": "todo",
+   "note": "tools/make_judges.py, then paste private/judges_seed.sql into the D1 Console"
+  },
+  {
+   "id": 32,
+   "title": "Announce poster awards per session from the judging results page",
+   "category": "Posters",
+   "owner": "Program team",
+   "due": "2026-12-18",
+   "status": "todo",
+   "note": "poster-results.html"
   }
  ]
 }
