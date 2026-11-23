@@ -1,37 +1,134 @@
 {
  "sections": [
-  {"title": "Venue", "items": [
-   {"label": "Hotel", "text": "Millennium Hilton Bangkok"},
-   {"label": "Ballrooms", "text": "Ballroom A+B and Ballroom C: plenary, keynote and larger symposium sessions"},
-   {"label": "30th floor", "text": "Yangtze, Amazon, Seine, Ganges, Mekong and Nile"},
-   {"label": "Posters and registration", "text": "Pre-function area"},
-   {"label": "Floor plan", "text": ""}
-  ]},
-  {"title": "Key times", "items": [
-   {"label": "Opening ceremony", "text": "Mon 14 Dec, 09:30"},
-   {"label": "Poster Session 1", "text": "Thu 17 Dec, 10:00–12:00", "link": "?posters=1"},
-   {"label": "Poster Session 2", "text": "Thu 17 Dec, 14:00–17:00 (presenters at boards 15:00–17:00)", "link": "?posters=2"},
-   {"label": "Poster Session 3", "text": "Fri 18 Dec, 10:00–12:00", "link": "?posters=3"},
-   {"label": "Banquet", "text": "Wed 16 Dec, 19:00. There is no poster session on Wednesday."}
-  ]},
-  {"title": "Meals", "items": [
-   {"label": "Lunch", "text": "Conference lunch buffet. Venue to be announced."},
-   {"label": "Coffee breaks", "text": ""},
-   {"label": "Meal coupons", "text": "Please bring your coupon to each lunch and to the Banquet."}
-  ]},
-  {"title": "Services", "items": [
-   {"label": "Cloakroom", "text": "Baggage storage. Also the first-aid and lost-and-found point."},
-   {"label": "Wi-Fi", "text": ""},
-   {"label": "Presenters", "text": "Please check your slides with the student staff in your room before your session or during a coffee break."}
-  ]},
-  {"title": "Contact", "items": [
-   {"label": "Organizers", "text": ""},
-   {"label": "Emergency", "text": ""}
-  ]},
-  {"title": "Using this app", "items": [
-   {"label": "My Agenda", "text": "Tap the star on any talk or poster to save it. Your list stays in this browser on this phone."},
-   {"label": "Best way to open", "text": "Scan the QR codes with your phone camera so the page opens in Safari or Chrome, not inside a chat app."},
-   {"label": "Feedback", "text": "A 5-minute anonymous survey opens on the last day.", "link": "survey.html"}
-  ]}
+  {
+   "title": "Venue",
+   "items": [
+    {
+     "label": "Hotel",
+     "text": "Millennium Hilton Bangkok"
+    },
+    {
+     "label": "Level 2",
+     "text": "Ballroom A+B, Ballroom C (together: Grand Ballroom A+B+C), Pre-function area"
+    },
+    {
+     "label": "Level 30",
+     "text": "Yangtze, Amazon, Seine, Ganges, Mekong and Nile"
+    },
+    {
+     "label": "Posters and registration",
+     "text": "Pre-function area, Level 2"
+    },
+    {
+     "label": "Floor plan",
+     "text": ""
+    }
+   ]
+  },
+  {
+   "title": "Key times",
+   "items": [
+    {
+     "label": "Opening ceremony",
+     "text": "Mon 14 Dec, 09:30, Grand Ballroom A+B+C"
+    },
+    {
+     "label": "Plenary lectures",
+     "text": "Mon 10:00 · Tue 09:00 and 10:00 · Wed 09:00 · Thu 13:00, Grand Ballroom A+B+C"
+    },
+    {
+     "label": "Banquet",
+     "text": "Wed 16 Dec, 19:00, Grand Ballroom. There is no poster session on Wednesday."
+    },
+    {
+     "label": "Poster Session 1",
+     "text": "Thu 17 Dec, 10:00–12:00",
+     "link": "?posters=1"
+    },
+    {
+     "label": "Poster Session 2",
+     "text": "Thu 17 Dec, 14:00–17:00 (presenters at boards 15:00–17:00)",
+     "link": "?posters=2"
+    },
+    {
+     "label": "Korea–Thailand Networking Dinner",
+     "text": "Thu 17 Dec, evening"
+    },
+    {
+     "label": "Poster Session 3",
+     "text": "Fri 18 Dec, 10:00–12:00",
+     "link": "?posters=3"
+    },
+    {
+     "label": "Closing ceremony",
+     "text": "Fri 18 Dec, 13:00, Grand Ballroom A+B"
+    }
+   ]
+  },
+  {
+   "title": "Meals",
+   "items": [
+    {
+     "label": "Lunch",
+     "text": "Conference lunch buffet. Venue to be announced."
+    },
+    {
+     "label": "Coffee breaks",
+     "text": ""
+    },
+    {
+     "label": "Meal coupons",
+     "text": "Please bring your coupon to each lunch and to the Banquet."
+    }
+   ]
+  },
+  {
+   "title": "Services",
+   "items": [
+    {
+     "label": "Cloakroom",
+     "text": "Baggage storage. Also the first-aid and lost-and-found point."
+    },
+    {
+     "label": "Wi-Fi",
+     "text": ""
+    },
+    {
+     "label": "Presenters",
+     "text": "Please check your slides with the student staff in your room before your session or during a coffee break."
+    }
+   ]
+  },
+  {
+   "title": "Contact",
+   "items": [
+    {
+     "label": "Organizers",
+     "text": ""
+    },
+    {
+     "label": "Emergency",
+     "text": ""
+    }
+   ]
+  },
+  {
+   "title": "Using this app",
+   "items": [
+    {
+     "label": "My Agenda",
+     "text": "Tap the star on any talk or poster to save it. Your list stays in this browser on this phone."
+    },
+    {
+     "label": "Best way to open",
+     "text": "Scan the QR codes with your phone camera so the page opens in Safari or Chrome, not inside a chat app."
+    },
+    {
+     "label": "Feedback",
+     "text": "A 5-minute anonymous survey opens on the last day.",
+     "link": "survey.html"
+    }
+   ]
+  }
  ]
 }

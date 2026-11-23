@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-15",
+ "updated": "2026-11-23",
  "categories": [
   "Program and slides",
   "Posters",
@@ -213,8 +213,8 @@
    "category": "Web app and QR",
    "owner": "Soorathep",
    "due": "2026-12-04",
-   "status": "todo",
-   "note": ""
+   "status": "doing",
+   "note": "23 Nov: 267 talks loaded from Program at a Glance (times, rooms, speakers, affiliations). Still needed: talk titles, chairs, abstracts, poster list"
   },
   {
    "id": 24,
@@ -305,6 +305,24 @@
    "due": "2026-12-12",
    "status": "todo",
    "note": "D1 Console: DELETE FROM responses; DELETE FROM scores; then load the real judges"
+  },
+  {
+   "id": 34,
+   "title": "Ask for a fuller program export: talk titles, session chairs, full affiliations (68 are cut short with …), abstracts",
+   "category": "Program and slides",
+   "owner": "Program team",
+   "due": "2026-11-30",
+   "status": "todo",
+   "note": "Re-import with tools/import_glance.py; titles/chairs need extra columns"
+  },
+  {
+   "id": 35,
+   "title": "Send the poster list (board number, title, presenter, affiliation, symposium) for Sessions 1–3",
+   "category": "Posters",
+   "owner": "Program team",
+   "due": "2026-12-04",
+   "status": "todo",
+   "note": "Needed for the poster pages and judge assignment"
   }
  ]
 }
