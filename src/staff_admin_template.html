@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>MCARE 2026 รายชื่อนิสิตช่วยงาน</title>
+<title>MCARE 2026 Student Staff / นิสิตช่วยงาน</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -52,20 +52,20 @@ var TK = 'mcare2026-admin';
 var R = [];
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function login(msg){
-  app.innerHTML = '<header><h1>นิสิตช่วยงาน</h1></header><form class="login" id="lf" method="post" action="#">' +
+  app.innerHTML = '<header><h1>Student staff / นิสิตช่วยงาน</h1></header><form class="login" id="lf" method="post" action="#">' +
     '<input type="text" name="username" autocomplete="username" value="mcare2026-admin" readonly style="display:none">' +
     '<label for="tok"><b>Admin token</b></label><input id="tok" name="password" type="password" autocomplete="current-password">' +
-    '<button type="submit">แสดงรายชื่อ</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</form>';
+    '<button type="submit">แสดงรายชื่อ / Show list</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</form>';
   document.getElementById('lf').onsubmit = function(e){ e.preventDefault(); var t = document.getElementById('tok').value.trim(); if (t) load(t); };
 }
 function tok(){ try { return localStorage.getItem(TK) || sessionStorage.getItem(TK); } catch(e){ return null; } }
 function forget(){ try { localStorage.removeItem(TK); sessionStorage.removeItem(TK); } catch(e){} }
 function load(t){
-  app.innerHTML = '<div class="msg">กำลังโหลด...</div>';
+  app.innerHTML = '<div class="msg">กำลังโหลด / Loading...</div>';
   fetch(S.endpoint.replace(/\/$/, '') + '/staff-list', {headers: {Authorization: 'Bearer ' + t}})
     .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j.staff; }); })
     .then(function(list){ try { localStorage.setItem(TK, t); } catch(e){} R = list; show(); })
-    .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Token ไม่ถูกต้อง' : 'โหลดไม่สำเร็จ: ' + e.message); });
+    .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Token ไม่ถูกต้อง / Wrong token' : 'โหลดไม่สำเร็จ / Could not load: ' + e.message); });
 }
 function label(list, id){ for (var i = 0; i < list.length; i++) if (list[i][0] === id) return list[i][1]; return id; }
 function slotName(rows, cols, id){ var p = id.split('_'); return label(rows, p[0]) + ' ' + label(cols, p[1]); }
@@ -78,20 +78,20 @@ function heat(key, rows, cols, title, hint){
     h += '<tr><th class="r">' + esc(r[1]) + '</th>' + cols.map(function(c){
       var id = r[0] + '_' + c[0], n = R.filter(function(x){ return (x[key] || []).indexOf(id) >= 0; }).length, a = n / max;
       var bg = n ? 'rgba(15,110,107,' + (0.15 + 0.85 * a).toFixed(2) + ')' : '#F7F5F1', fg = a > 0.5 ? '#fff' : '#1C242B';
-      return '<td><button data-k="' + key + '" data-id="' + id + '" style="background:' + bg + ';color:' + fg + '" aria-label="' + esc(r[1] + ' ' + c[1]) + ': ' + n + ' คน">' + n + '</button></td>';
+      return '<td><button data-k="' + key + '" data-id="' + id + '" style="background:' + bg + ';color:' + fg + '" aria-label="' + esc(r[1] + ' ' + c[1]) + ': ' + n + ' คน / people">' + n + '</button></td>';
     }).join('') + '</tr>';
   });
   return h + '</tbody></table><div class="who" id="who-' + key + '"></div></div>';
 }
 function show(){
   var shirts = {}; R.forEach(function(r){ if (r.shirt) shirts[r.shirt] = (shirts[r.shirt] || 0) + 1; });
-  var h = '<header><h1>นิสิตช่วยงาน</h1><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" id="cl">คัดลอก LINE ID ทั้งหมด</button><button class="ghost" id="ce">คัดลอกอีเมลทั้งหมด</button><button class="ghost" id="csv">ดาวน์โหลด CSV</button><button class="ghost" id="out">ออกจากระบบ</button></span></header>';
-  h += '<div class="kpis"><div class="kpi"><b>' + R.length + '</b><span>นิสิตที่กรอกแล้ว</span></div>' +
-    S.shirts.map(function(s){ return '<div class="kpi"><b>' + (shirts[s] || 0) + '</b><span>เสื้อ ' + s + '</span></div>'; }).join('') + '</div>';
-  h += heat('meet', S.meetDays, S.meetTimes, 'เวลาที่สะดวกประชุม (จำนวนคนที่ว่าง)', 'กดช่องเพื่อดูว่าใครว่าง และใครไม่ว่าง ช่องสีเข้มคือช่วงที่ว่างพร้อมกันมากที่สุด');
-  h += heat('event', S.eventDays, S.eventTimes, 'วันที่ช่วยงานได้ (จำนวนคน)', 'กดช่องเพื่อดูรายชื่อ');
-  h += '<div class="card"><h2>รายชื่อ</h2><table class="list"><thead><tr><th>ชื่อ</th><th>ระดับ</th><th>โทร</th><th>LINE</th><th>อีเมล</th><th>งานที่สนใจ</th><th>เสื้อ</th><th>อาหาร / หมายเหตุ</th></tr></thead><tbody>' +
-    R.map(function(r){ return '<tr><td><b>' + esc(nm(r)) + '</b><br><small>' + esc([r.sid, r.dept].filter(Boolean).join(' · ')) + '</small></td><td>' + esc(r.level) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.line) + '</td><td>' + esc(r.email) + '</td><td>' + esc((r.roles || []).map(function(x){ return label(S.roles, x).split(' / ')[0]; }).join(', ')) + (r.lang ? '<br><small>ภาษา: ' + esc(r.lang) + '</small>' : '') + '</td><td>' + esc(r.shirt) + '</td><td>' + esc(r.diet) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + '</td></tr>'; }).join('') +
+  var h = '<header><h1>Student staff / นิสิตช่วยงาน</h1><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" id="cl">คัดลอก LINE ID ทั้งหมด / Copy all LINE IDs</button><button class="ghost" id="ce">คัดลอกอีเมลทั้งหมด / Copy all emails</button><button class="ghost" id="csv">ดาวน์โหลด CSV / Download CSV</button><button class="ghost" id="out">ออกจากระบบ / Sign out</button></span></header>';
+  h += '<div class="kpis"><div class="kpi"><b>' + R.length + '</b><span>นิสิตที่กรอกแล้ว / Signed up</span></div>' +
+    S.shirts.map(function(s){ return '<div class="kpi"><b>' + (shirts[s] || 0) + '</b><span>เสื้อ / Shirt ' + s + '</span></div>'; }).join('') + '</div>';
+  h += heat('meet', S.meetDays, S.meetTimes, 'เวลาที่สะดวกประชุม / Weekly meeting availability (people free)', 'กดช่องเพื่อดูว่าใครว่างและใครไม่ว่าง ช่องสีเข้มคือช่วงที่ว่างพร้อมกันมากที่สุด / Tap a cell to see who is free and who is not. Darker cells have more people free.');
+  h += heat('event', S.eventDays, S.eventTimes, 'วันที่ช่วยงานได้ / Availability during the conference (people)', 'กดช่องเพื่อดูรายชื่อ / Tap a cell to see who is available.');
+  h += '<div class="card"><h2>รายชื่อ / Staff list</h2><table class="list"><thead><tr><th>ชื่อ / Name</th><th>ระดับ / Level</th><th>โทร / Phone</th><th>LINE</th><th>อีเมล / Email</th><th>งานที่สนใจ / Tasks</th><th>เสื้อ / Shirt</th><th>อาหาร, หมายเหตุ / Diet, notes</th></tr></thead><tbody>' +
+    R.map(function(r){ return '<tr><td><b>' + esc(nm(r)) + '</b><br><small>' + esc([r.sid, r.dept].filter(Boolean).join(' · ')) + '</small></td><td>' + esc(r.level) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.line) + '</td><td>' + esc(r.email) + '</td><td>' + esc((r.roles || []).map(function(x){ return label(S.roles, x).split(' / ')[0]; }).join(', ')) + (r.lang ? '<br><small>ภาษา / Languages: ' + esc(r.lang) + '</small>' : '') + '</td><td>' + esc(r.shirt) + '</td><td>' + esc(r.diet) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + '</td></tr>'; }).join('') +
     '</tbody></table></div>';
   app.innerHTML = h;
   [].forEach.call(app.querySelectorAll('table.hm button'), function(b){ b.onclick = function(){ pick(b); }; });
@@ -106,11 +106,11 @@ function pick(b){
   var rows = key === 'meet' ? S.meetDays : S.eventDays, cols = key === 'meet' ? S.meetTimes : S.eventTimes;
   var yes = R.filter(function(x){ return (x[key] || []).indexOf(id) >= 0; }), no = R.filter(function(x){ return yes.indexOf(x) < 0; });
   var w = document.getElementById('who-' + key); w.style.display = 'block';
-  w.innerHTML = '<b>' + esc(slotName(rows, cols, id)) + '</b><br>ว่าง ' + yes.length + ' คน: ' + (esc(yes.map(nm).join(', ')) || '-') + '<br><span style="color:#66727C">ไม่ว่าง ' + no.length + ' คน: ' + (esc(no.map(nm).join(', ')) || '-') + '</span>';
+  w.innerHTML = '<b>' + esc(slotName(rows, cols, id)) + '</b><br>ว่าง / Free: ' + yes.length + ' คน / people: ' + (esc(yes.map(nm).join(', ')) || '-') + '<br><span style="color:#66727C">ไม่ว่าง / Not free: ' + no.length + ' คน / people: ' + (esc(no.map(nm).join(', ')) || '-') + '</span>';
 }
 function copy(s, btn){
   var t = btn.textContent;
-  (navigator.clipboard ? navigator.clipboard.writeText(s) : Promise.reject()).then(function(){ btn.textContent = 'คัดลอกแล้ว'; setTimeout(function(){ btn.textContent = t; }, 1500); }, function(){ prompt('คัดลอกข้อความนี้', s); });
+  (navigator.clipboard ? navigator.clipboard.writeText(s) : Promise.reject()).then(function(){ btn.textContent = 'คัดลอกแล้ว / Copied'; setTimeout(function(){ btn.textContent = t; }, 1500); }, function(){ prompt('คัดลอกข้อความนี้ / Copy this text', s); });
 }
 function csv(){
   var cols = ['name','nick','sid','level','dept','phone','line','email','shirt','roles','lang','diet','note','meet','event','updated_at'];
