@@ -451,6 +451,15 @@
    "due": "2026-12-11",
    "status": "todo",
    "note": "Monday or Thursday; restaurant near the hotel; THB 1,000 to 1,500 per person. Action Plan 23 Nov, item 12"
+  },
+  {
+   "id": 50,
+   "title": "Name badges: pre-print all badges; attendees sign in on paper at the registration desk",
+   "category": "Printing and supplies",
+   "owner": "Soorathep, Fatee",
+   "due": "2026-11-24",
+   "status": "done",
+   "note": "Decided 24 Nov: on-site printing dropped (thermal printers cannot print colour). Pre-print all badges in colour (Action Plan item 1), sort them by surname into desks, and use a paper sign-in sheet. Keep blank badges for on-site registrations and name corrections"
   }
  ]
 }
