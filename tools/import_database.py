@@ -7,12 +7,15 @@ Sheets used: Oral (one row per talk), Poster (one row per poster), Symposia.
 Rebuilds sessions, talks, posters and poster sessions. Keeps rooms, events, settings and
 sessions marked "manual": true (e.g. Opening Ceremony, ERC Closed Session).
 If a "Chair" column appears in the Oral sheet later, it is picked up automatically.
+Abstracts and keywords go to data/abstracts.json (loaded by the app only when a talk or poster page opens).
 """
 import json, os, re, sys, datetime
 import openpyxl
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 OUT = os.path.join(ROOT, "data", "program.json")
+ABS = os.path.join(ROOT, "data", "abstracts.json")
+NO_ABSTRACT = {"", "abstract not available", "tba"}
 ROOM_IDS = {"Ballroom A+B": "ab", "Ballroom C": "c", "Yangtze": "yangtze", "Amazon": "amazon",
             "Seine": "seine", "Ganges": "ganges", "Mekong": "mekong", "Nile": "nile"}
 SESSION_GAP = 20   # minutes; a longer gap in one room starts a new session
@@ -21,6 +24,7 @@ def mins(t): h, m = t.split(":"); return int(h) * 60 + int(m)
 def iso(d): return datetime.datetime.strptime(d.strip(), "%a, %d %b %Y").date().isoformat()
 def room_id(r): return ROOM_IDS.get(re.sub(r"\s*\(L\d+\)", "", r or "").strip())
 def clean(v): return " ".join(str(v).split()) if v is not None else ""
+def absText(v): t = clean(v); return "" if t.lower() in NO_ABSTRACT else t
 def rng(v): a, b = re.split(r"\s*[–-]\s*", clean(v)); return [a, b]
 
 def rows(ws):
@@ -51,9 +55,11 @@ def main(path):
                         title=clean(r.get("Title")), speaker=clean(r.get("Presenter")), affil=clean(r.get("Affiliation")),
                         country=clean(r.get("Country")), authors=clean(r.get("Authors")),
                         authorAffils=clean(r.get("Author Affiliations")), abstractNo=clean(r.get("Abstract No.")),
+                        keywords=clean(r.get("Keywords")), abstract=absText(r.get("Abstract")),
                         chair=clean(r.get("Chair") or r.get("Chairs") or r.get("Session Chair"))))
     raw.sort(key=lambda t: (t["day"], t["room"], mins(t["start"])))
     sessions, talks, cur = [], [], None
+    abstracts = {}
     for t in raw:
         if not (cur and cur["day"] == t["day"] and cur["room"] == t["room"] and cur["symposium"] == t["sym"]
                 and mins(t["start"]) - mins(cur["end"]) <= SESSION_GAP):
@@ -71,6 +77,7 @@ def main(path):
                       "type": t["type"], "title": t["title"], "speaker": t["speaker"], "affil": t["affil"],
                       "country": t["country"], "authors": t["authors"], "authorAffils": t["authorAffils"],
                       "abstractNo": t["abstractNo"], "coauthors": [], "abstract": ""})
+        if t["abstract"] or t["keywords"]: abstracts[talks[-1]["id"]] = {"k": t["keywords"], "a": t["abstract"]}
     # plenaries are in the combined Grand Ballroom A+B+C: show them in Ballroom C as well
     for s in [s for s in sessions if s["symposium"] is None and s["room"] == "ab"]:
         sessions.append(dict(s, id=s["id"] + "-c", room="c", title="Plenary Lecture (Grand Ballroom A+B+C)"))
@@ -85,8 +92,11 @@ def main(path):
         rd = int(m.group(1)); s = re.match(r"Symposium (\d+)", clean(r.get("Symposium")))
         sid = int(s.group(1)) if s else None
         p = ps.setdefault(rd, {"id": rd, "day": iso(r["Date"]), "display": rng(r["Presentation"]), "core": rng(r["Core Time"]),
-                               "setup": rng(r["Set-up"]), "removal": rng(r["Removal"]), "symposia": [], "count": 0})
-        p["count"] += 1
+                               "setup": rng(r["Set-up"]), "removal": rng(r["Removal"]), "symposia": [], "count": 0, "n": 0})
+        p["count"] = max(p["count"], int(m.group(2)))   # highest board number (the map needs it; vacant boards stay empty)
+        p["n"] += 1                                      # number of posters
+        kw, ab = clean(r.get("Keywords")), absText(r.get("Abstract"))
+        if kw or ab: abstracts[no] = {"k": kw, "a": ab}
         if sid and sid not in p["symposia"]: p["symposia"].append(sid)
         posters.append({"board": no, "session": rd, "symposium": sid, "title": clean(r.get("Title")),
                         "presenter": clean(r.get("Presenter")), "affil": clean(r.get("Affiliation")), "country": clean(r.get("Country")),
@@ -100,9 +110,14 @@ def main(path):
     prog["meta"]["programAsOf"] = as_of
     prog["meta"]["boardPrefix"] = "P"
     json.dump(prog, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    json.dump(abstracts, open(ABS, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     chairs = sum(1 for s in sessions if s["chairs"])
     print(f"Imported {len(talks)} talks in {len(sessions)} sessions (+{len(keep)} kept), {len(posters)} posters in {len(ps)} rounds "
-          f"({', '.join(f'round {k}: {ps[k]['count']}' for k in sorted(ps))}). Program as of {as_of}. Sessions with chairs: {chairs}.")
+          f"({', '.join(f'round {k}: {ps[k]['n']}' for k in sorted(ps))}). Program as of {as_of}. Sessions with chairs: {chairs}. "
+          f"Abstracts: {sum(1 for v in abstracts.values() if v['a'])} ({os.path.getsize(ABS) // 1024} KB).")
+    for k, p in sorted(ps.items()):
+        gaps = sorted(set(range(1, p["count"] + 1)) - {int(x["board"].split("-")[1]) for x in posters if x["session"] == k})
+        if gaps: print(f"Note: round {k} has vacant boards: " + ", ".join(f"P{k}-{g:03d}" for g in gaps))
     for p in problems: print("PROBLEM:", p)
 
 if __name__ == "__main__":

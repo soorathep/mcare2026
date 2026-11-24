@@ -307,7 +307,7 @@ function viewNow(){
       var open = mm(p.display[0]) <= now.min;
       h += '<a class="card" href="' + href({posters: p.id}) + '"><div class="row">' + IC.poster + '<span class="rname">Poster Session ' + p.id + '</span><span class="grow"></span>' +
         (open ? liveChip('OPEN') : '<span class="chip soon">Starts ' + p.display[0] + '</span>') + '</div>' +
-        '<div style="font-size:14px">' + esc(D.meta.posterArea) + ' · on display ' + p.display[0] + '–' + p.display[1] + '<br><span class="muted">' + p.count + ' posters · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + ' · Symposia ' + p.symposia.join(', ') + '</span></div>' +
+        '<div style="font-size:14px">' + esc(D.meta.posterArea) + ' · on display ' + p.display[0] + '–' + p.display[1] + '<br><span class="muted">' + (p.n || p.count) + ' posters · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + ' · Symposia ' + p.symposia.join(', ') + '</span></div>' +
         '<div class="box"><b>Presenters at boards (core time):</b> ' + p.core[0] + '–' + p.core[1] + '</div><span class="link">Browse posters</span></a>';
     });
     h += '</div>';
@@ -487,11 +487,25 @@ function viewTalk(){
   if (nx) h += '<div class="stack" style="padding-top:16px"><a class="card dash" href="' + href({talk: nx.id}) + '"><span class="label">Next in ' + esc(r.name) + ' · ' + nx.start + '</span><span class="ttl">' + esc(ttl(nx)) + '</span><span class="meta" style="font-size:13px">' + esc(nx.speaker) + ' · ' + esc(nx.affil) + '</span></a></div>';
   return shell(h, 'schedule');
 }
+var ABS = null, absLoading = false;
+function absKey(x){ return x.board || x.id; }
 function absBlock(x){
-  if (x.abstract) return '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml(x.abstract) + '</div>';
-  if (!x.authorAffils && !x.abstractNo) return '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml('') + '</div>';
-  return '<div class="sec"><h2>Author affiliations</h2></div><div class="abs" style="font-size:14px">' + (x.authorAffils ? '<p>' + esc(x.authorAffils) + '</p>' : '') +
+  var k = absKey(x);
+  if (!x.abstract && ABS === null) {
+    if (!absLoading) {
+      absLoading = true;
+      fetch('data/abstracts.json').then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(j){ ABS = j; }, function(){ ABS = {}; })
+        .then(function(){ absLoading = false; var el = document.getElementById('absbox'); if (el) { var y = TALK[el.getAttribute('data-k')] || POSTER[el.getAttribute('data-k')]; if (y) el.outerHTML = absBlock(y); } });
+    }
+    return '<div id="absbox" data-k="' + esc(k) + '"><div class="sec"><h2>Abstract</h2></div><div class="abs"><p class="muted">Loading the abstract...</p></div></div>';
+  }
+  var e = (ABS && ABS[k]) || {}, a = x.abstract || e.a || '';
+  var h = '<div id="absbox" data-k="' + esc(k) + '"><div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml(a) +
+    (e.k ? '<p style="font-size:14px"><b>Keywords:</b> ' + esc(e.k) + '</p>' : '') + '</div>';
+  if (x.authorAffils || x.abstractNo) h += '<div class="sec"><h2>Author affiliations</h2></div><div class="abs" style="font-size:14px">' + (x.authorAffils ? '<p>' + esc(x.authorAffils) + '</p>' : '') +
     (x.abstractNo ? '<p class="muted" style="font-size:13px">Abstract No. ' + esc(x.abstractNo) + (x.country ? ' · ' + esc(x.country) : '') + '</p>' : '') + '</div>';
+  return h + '</div>';
 }
 function absHtml(a){
   if (!a) return '<p class="muted">The abstract will be added soon.</p>';
@@ -555,7 +569,7 @@ function drawSlots(day, scroll){
         var r = ROOM[it.s.room];
         html += '<div class="item"><a href="' + href({talk: it.t.id}) + '"><span class="ir"><span class="dot" style="width:8px;height:8px;background:' + r.color + '"></span>' + esc(r.name) + '<em>· ' + esc(it.s.symposium ? 'S' + it.s.symposium : it.s.title) + ' · ' + esc(it.t.type) + ' · ' + it.t.start + '–' + it.t.end + '</em></span><span class="it">' + esc(ttl(it.t)) + '</span><span class="is">' + esc(it.t.speaker) + '</span>' + (it.s.chairs.length ? '<span class="is" style="font-size:12px">Chair: ' + esc(it.s.chairs.join(', ')) + '</span>' : '') + '</a>' + starBtn(it.t.id) + '</div>';
       } else if (it.k === 'poster') {
-        html += '<a class="item" href="' + href({posters: it.p.id}) + '" style="align-items:center;padding:14px"><span style="color:var(--ink)">' + IC.poster + '</span><span class="grow" style="display:flex;flex-direction:column;gap:2px"><span class="it">Poster Session ' + it.p.id + ' · ' + it.p.count + ' posters</span><span class="is">' + it.p.display[0] + '–' + it.p.display[1] + ' · ' + esc(D.meta.posterArea) + ' · Core time ' + it.p.core[0] + '–' + it.p.core[1] + '</span></span>' + IC.chev + '</a>';
+        html += '<a class="item" href="' + href({posters: it.p.id}) + '" style="align-items:center;padding:14px"><span style="color:var(--ink)">' + IC.poster + '</span><span class="grow" style="display:flex;flex-direction:column;gap:2px"><span class="it">Poster Session ' + it.p.id + ' · ' + (it.p.n || it.p.count) + ' posters</span><span class="is">' + it.p.display[0] + '–' + it.p.display[1] + ' · ' + esc(D.meta.posterArea) + ' · Core time ' + it.p.core[0] + '–' + it.p.core[1] + '</span></span>' + IC.chev + '</a>';
       } else if (it.k === 'event') {
         html += '<div class="item brk">' + esc(it.e.title) + ' · ' + esc(it.e.place) + ' · ' + it.e.start + '</div>';
       } else {
@@ -623,7 +637,7 @@ function viewPosters(){
   var p = PSES[Q.get('posters')] || D.posterSessions[0];
   var rows = Math.ceil(p.count / PER_ROW);
   var h = '<header class="whdr" style="border-top:6px solid var(--ink)">' + backLink(href(), 'Now') +
-    '<div><h1>Poster Session ' + p.id + '</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(shortDay(p.day)) + ' · ' + esc(D.meta.posterArea) + '</div><div class="meta" style="font-size:13px;margin-top:2px">' + p.count + ' posters · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + ' · Symposia ' + p.symposia.join(', ') + '</div></div>' +
+    '<div><h1>Poster Session ' + p.id + '</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(shortDay(p.day)) + ' · ' + esc(D.meta.posterArea) + '</div><div class="meta" style="font-size:13px;margin-top:2px">' + (p.n || p.count) + ' posters · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + ' · Symposia ' + p.symposia.join(', ') + '</div></div>' +
     '<div class="btns" style="gap:8px"><div class="box"><b style="display:block;font-size:12px" class="g">On display</b><b style="font-size:14px">' + p.display[0] + '–' + p.display[1] + '</b></div><div class="box"><b style="display:block;font-size:12px" class="g">Presenters at boards</b><b style="font-size:14px">' + p.core[0] + '–' + p.core[1] + '</b></div></div></header>';
   h += '<div class="stack" style="padding-top:16px"><div class="card"><div class="row" style="justify-content:space-between"><span class="sec" style="padding:0"><h2>Floor map</h2></span><a class="link" style="font-size:13px" href="' + href({map: p.id}) + '">Open full map</a></div><div class="zones" id="zones">';
   for (var i = 0; i < rows; i++) {
@@ -664,7 +678,7 @@ function drawPosters(p){
     }
     return true;
   });
-  document.getElementById('pcount').textContent = 'Showing ' + list.length + ' of ' + p.count;
+  document.getElementById('pcount').textContent = 'Showing ' + list.length + ' of ' + (p.n || p.count);
   document.getElementById('plist').innerHTML = list.length ? list.map(posterItem).join('') : '<div class="empty-s">No posters match.</div>';
 }
 function viewPoster(){
@@ -716,7 +730,7 @@ function drawMap(p, n){
     (D.meta.sample ? '<span class="meta" style="font-size:11px">Layout is indicative. Panel positions will follow the hotel floor plan.</span>' : '') + '</div>';
   if (n) {
     var bd = bid(p.id, n), x = POSTER[bd];
-    h += '<div class="card" style="flex-direction:row;align-items:center;gap:14px;border:2px solid var(--amber)"><span class="bigboard"><small>BOARD</small><b style="font-size:22px">' + bd + '</b></span><span style="display:flex;flex-direction:column;gap:3px;font-size:14px"><b>Row ' + rowOf(bd) + ' · Panel ' + panelOf(bd) + ' · ' + faceOf(bd) + '</b>' + (x ? '<a class="link" href="' + href({poster: bd}) + '">' + esc(x.title) + '</a>' : '') + '</span></div>';
+    h += '<div class="card" style="flex-direction:row;align-items:center;gap:14px;border:2px solid var(--amber)"><span class="bigboard"><small>BOARD</small><b style="font-size:22px">' + bd + '</b></span><span style="display:flex;flex-direction:column;gap:3px;font-size:14px"><b>Row ' + rowOf(bd) + ' · Panel ' + panelOf(bd) + ' · ' + faceOf(bd) + '</b>' + (x ? '<a class="link" href="' + href({poster: bd}) + '">' + esc(x.title) + '</a>' : '<span class="muted">Vacant board</span>') + '</span></div>';
   }
   h += '<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><div aria-hidden="true" class="panel" style="width:26px;flex-shrink:0"><span style="height:14px"></span><span style="height:14px"></span></div><span style="font-size:13px" class="g">Each panel holds two boards, one on each face. The odd number faces the aisle above the row and the even number faces the aisle below.</span></div></div>';
   document.getElementById('mapwrap').innerHTML = h;

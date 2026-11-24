@@ -15,7 +15,8 @@ Served by GitHub Pages at https://soorathep.github.io/mcare2026/
 - `data/staff.json`, `src/staff_template.html`, `src/staff_admin_template.html` student staff sign-up
 - `worker/` Cloudflare Worker and database schema (survey, poster judging, staff sign-up)
 - `tools/make_judges.py` assigns judges, creates codes and judge cards (output in `private/`)
-- `tools/import_database.py` imports the organizers' Program Database workbook
+- `tools/import_database.py` imports the organizers' Program Database workbook (writes `data/program.json` and `data/abstracts.json`)
+- `data/abstracts.json` abstracts and keywords, loaded only when a talk or poster page opens
 - `tools/build.py` builds all pages
 - `tools/make_sample.py` regenerates the sample data
 
