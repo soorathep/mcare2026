@@ -73,7 +73,7 @@ function nm(r){ return r.name + (r.nick ? ' (' + r.nick + ')' : ''); }
 function heat(key, rows, cols, title, hint){
   var max = 1;
   rows.forEach(function(r){ cols.forEach(function(c){ var n = R.filter(function(x){ return (x[key] || []).indexOf(r[0] + '_' + c[0]) >= 0; }).length; if (n > max) max = n; }); });
-  var h = '<div class="card"><h2>' + title + '</h2><p class="hint">' + hint + '</p><table class="hm"><thead><tr><th></th>' + cols.map(function(c){ return '<th>' + esc(c[1].split(' ')[0]) + '</th>'; }).join('') + '</tr></thead><tbody>';
+  var h = '<div class="card"><h2>' + title + '</h2><p class="hint">' + hint + '</p><table class="hm"><thead><tr><th></th>' + cols.map(function(c){ return '<th>' + esc(c[2] || c[1]) + '</th>'; }).join('') + '</tr></thead><tbody>';
   rows.forEach(function(r){
     h += '<tr><th class="r">' + esc(r[1]) + '</th>' + cols.map(function(c){
       var id = r[0] + '_' + c[0], n = R.filter(function(x){ return (x[key] || []).indexOf(id) >= 0; }).length, a = n / max;
@@ -91,7 +91,7 @@ function show(){
   h += heat('meet', S.meetDays, S.meetTimes, 'เวลาที่สะดวกประชุม (จำนวนคนที่ว่าง)', 'กดช่องเพื่อดูว่าใครว่าง และใครไม่ว่าง ช่องสีเข้มคือช่วงที่ว่างพร้อมกันมากที่สุด');
   h += heat('event', S.eventDays, S.eventTimes, 'วันที่ช่วยงานได้ (จำนวนคน)', 'กดช่องเพื่อดูรายชื่อ');
   h += '<div class="card"><h2>รายชื่อ</h2><table class="list"><thead><tr><th>ชื่อ</th><th>ระดับ</th><th>โทร</th><th>LINE</th><th>อีเมล</th><th>งานที่สนใจ</th><th>เสื้อ</th><th>อาหาร / หมายเหตุ</th></tr></thead><tbody>' +
-    R.map(function(r){ return '<tr><td><b>' + esc(nm(r)) + '</b><br><small>' + esc([r.sid, r.dept].filter(Boolean).join(' · ')) + '</small></td><td>' + esc(r.level) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.line) + '</td><td>' + esc(r.email) + '</td><td>' + esc((r.roles || []).map(function(x){ return label(S.roles, x).split(' (')[0]; }).join(', ')) + (r.lang ? '<br><small>ภาษา: ' + esc(r.lang) + '</small>' : '') + '</td><td>' + esc(r.shirt) + '</td><td>' + esc(r.diet) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + '</td></tr>'; }).join('') +
+    R.map(function(r){ return '<tr><td><b>' + esc(nm(r)) + '</b><br><small>' + esc([r.sid, r.dept].filter(Boolean).join(' · ')) + '</small></td><td>' + esc(r.level) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.line) + '</td><td>' + esc(r.email) + '</td><td>' + esc((r.roles || []).map(function(x){ return label(S.roles, x).split(' / ')[0]; }).join(', ')) + (r.lang ? '<br><small>ภาษา: ' + esc(r.lang) + '</small>' : '') + '</td><td>' + esc(r.shirt) + '</td><td>' + esc(r.diet) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + '</td></tr>'; }).join('') +
     '</tbody></table></div>';
   app.innerHTML = h;
   [].forEach.call(app.querySelectorAll('table.hm button'), function(b){ b.onclick = function(){ pick(b); }; });
