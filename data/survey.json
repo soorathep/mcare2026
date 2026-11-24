@@ -1,134 +1,418 @@
 {
  "title": "MCARE 2026 Feedback",
- "intro": "Thank you for joining MCARE 2026. This survey takes about 5 minutes and is anonymous. When you finish, you will get a QR code to collect a thank-you gift at the registration desk.",
+ "intro": "Thank you for joining MCARE 2026. Your feedback helps us plan the next MCARE. The survey takes about 8 minutes and is anonymous. When you finish, you will get a QR code to collect a thank-you gift at the registration desk.",
  "endpoint": "https://mcare2026-survey.ecs-thailand-election.workers.dev",
  "showInAppFrom": "2026-12-16",
+ "gift": {
+  "title": "Your gift code",
+  "text": "Show this QR code at the registration desk to collect your thank-you gift (one per person, while stocks last).",
+  "claimPage": "https://soorathep.github.io/mcare2026/claim.html"
+ },
+ "basedOn": "MCARE 2024 survey (questions kept comparable), plus MCARE 2026 items",
  "sections": [
   {
    "title": "About you",
    "questions": [
     {
-     "id": "role",
+     "id": "inst",
      "type": "choice",
-     "text": "Your role",
+     "text": "Which best describes your institution?",
      "options": [
-      "Student",
-      "Academic",
+      "University",
+      "Research institute",
       "Industry",
-      "Government",
       "Other"
      ],
      "required": true
     },
     {
-     "id": "first",
+     "id": "position",
      "type": "choice",
-     "text": "Is this your first MCARE?",
+     "text": "Which best describes your position?",
      "options": [
-      "Yes",
-      "No"
+      "Principal investigator (professor, PI)",
+      "Full-time researcher (postdoc, research staff)",
+      "Student",
+      "Other"
      ],
      "required": true
+    },
+    {
+     "id": "region",
+     "type": "choice",
+     "text": "Where is your institution located?",
+     "options": [
+      "Thailand",
+      "South Korea",
+      "Asia (other)",
+      "Europe",
+      "Americas",
+      "Africa",
+      "Oceania"
+     ],
+     "required": true
+    },
+    {
+     "id": "times",
+     "type": "choice",
+     "text": "How many times have you attended MCARE, including MCARE 2026?",
+     "options": [
+      "Once",
+      "Twice",
+      "Three times or more"
+     ],
+     "required": true
+    },
+    {
+     "id": "roles",
+     "type": "multi",
+     "text": "Your role at MCARE 2026 (select all that apply)",
+     "options": [
+      "Organizing committee",
+      "Symposium organizer",
+      "Oral presenter",
+      "Poster presenter",
+      "Other participant"
+     ]
+    },
+    {
+     "id": "fields",
+     "type": "multi",
+     "text": "Apart from MCARE, which topics are closest to the conferences you attend? (choose up to 2)",
+     "options": [
+      "Materials science",
+      "Nanotechnology",
+      "Energy",
+      "Electrochemistry",
+      "Chemical engineering",
+      "Process engineering",
+      "Environmental engineering",
+      "Biotechnology",
+      "Chemistry",
+      "Physics",
+      "Catalysis",
+      "Other"
+     ],
+     "max": 2
     }
    ]
   },
   {
-   "title": "Scientific program",
-   "questions": [
-    {
-     "id": "plenary",
-     "type": "rating",
-     "text": "Quality of plenary and keynote lectures"
-    },
-    {
-     "id": "symposia",
-     "type": "rating",
-     "text": "Relevance and quality of the symposium talks"
-    },
-    {
-     "id": "posters",
-     "type": "rating",
-     "text": "Poster sessions (format, time, interaction)"
-    }
-   ]
-  },
-  {
-   "title": "Organization",
-   "questions": [
-    {
-     "id": "registration",
-     "type": "rating",
-     "text": "Registration and on-site help"
-    },
-    {
-     "id": "timekeeping",
-     "type": "rating",
-     "text": "Time keeping and session chairing"
-    },
-    {
-     "id": "information",
-     "type": "rating",
-     "text": "Information and signage, including the live program web app"
-    }
-   ]
-  },
-  {
-   "title": "Venue and hospitality",
-   "questions": [
-    {
-     "id": "rooms",
-     "type": "rating",
-     "text": "Meeting rooms and audio-visual equipment"
-    },
-    {
-     "id": "meals",
-     "type": "rating",
-     "text": "Lunches and coffee breaks"
-    },
-    {
-     "id": "banquet",
-     "type": "rating",
-     "text": "Banquet"
-    }
-   ]
-  },
-  {
-   "title": "Overall",
+   "title": "Overall satisfaction",
    "questions": [
     {
      "id": "overall",
      "type": "rating",
-     "text": "Overall satisfaction with MCARE 2026",
-     "na": false,
-     "required": true
+     "text": "How satisfied were you with MCARE 2026 overall?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied",
+     "required": true,
+     "na": false
     },
     {
-     "id": "nps",
-     "type": "nps",
-     "text": "How likely are you to recommend MCARE to a colleague?",
-     "required": true
+     "id": "location",
+     "type": "rating",
+     "text": "How satisfied were you with the location (Bangkok)?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "venue",
+     "type": "rating",
+     "text": "How satisfied were you with the venue (Millennium Hilton Bangkok)?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "nextloc",
+     "type": "choice",
+     "text": "Which location would you prefer for the next MCARE?",
+     "options": [
+      "Jeju, South Korea",
+      "Busan, South Korea",
+      "Seoul, South Korea",
+      "Bangkok, Thailand",
+      "Shanghai, China",
+      "Hawaii, USA",
+      "Seattle, USA",
+      "Paris, France",
+      "London, UK",
+      "Other"
+     ]
+    },
+    {
+     "id": "duration",
+     "type": "choice",
+     "text": "Is the conference duration (5 days) appropriate?",
+     "options": [
+      "Too short (6 days or more)",
+      "Appropriate",
+      "Too long (3 to 4 days)"
+     ]
+    },
+    {
+     "id": "fee",
+     "type": "choice",
+     "text": "How would you rate the registration fee?",
+     "options": [
+      "Very reasonable",
+      "Reasonable",
+      "Neutral",
+      "Expensive",
+      "Very expensive"
+     ]
+    },
+    {
+     "id": "month",
+     "type": "choice",
+     "text": "MCARE 2026 was held in December. Which period would you prefer for future MCAREs?",
+     "options": [
+      "January to February",
+      "March to April",
+      "May to June",
+      "July to August",
+      "September to October",
+      "November to December"
+     ]
     }
    ]
   },
   {
-   "title": "Comments",
+   "title": "Program content",
    "questions": [
+    {
+     "id": "sessions",
+     "type": "rating",
+     "text": "How satisfied were you with the content of the presentation sessions?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "plenary",
+     "type": "rating",
+     "text": "How satisfied were you with the plenary and keynote lectures?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "posters",
+     "type": "rating",
+     "text": "How satisfied were you with the poster sessions (format, time, interaction)?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "diversity",
+     "type": "rating",
+     "text": "How satisfied were you with the diversity of topics?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "topics",
+     "type": "text",
+     "text": "Any topics you would like to see added or emphasized at the next MCARE? (optional)"
+    }
+   ]
+  },
+  {
+   "title": "Organization and support",
+   "questions": [
+    {
+     "id": "registration",
+     "type": "rating",
+     "text": "Pre-registration process and conference website",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "onsite",
+     "type": "rating",
+     "text": "On-site assistance and registration desk",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "timekeeping",
+     "type": "rating",
+     "text": "Time keeping and session chairing",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "information",
+     "type": "rating",
+     "text": "Live program web app and signage",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "rooms",
+     "type": "rating",
+     "text": "Meeting rooms and audio-visual equipment",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "meals",
+     "type": "rating",
+     "text": "Lunches and coffee breaks",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "banquet",
+     "type": "rating",
+     "text": "Banquet",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
     {
      "id": "best",
      "type": "text",
-     "text": "What did you value most? (optional)"
+     "text": "What was the most satisfying aspect of the organization and support? (optional)"
+    },
+    {
+     "id": "worst",
+     "type": "text",
+     "text": "What was the least satisfying aspect of the organization and support? (optional)"
+    }
+   ]
+  },
+  {
+   "title": "Journal special issues",
+   "questions": [
+    {
+     "id": "journals",
+     "type": "rating",
+     "text": "How would you rate the selection of journals for the MCARE 2026 special issues?",
+     "lo": "Very dissatisfied",
+     "hi": "Very satisfied"
+    },
+    {
+     "id": "jfactor",
+     "type": "choice",
+     "text": "What matters most in choosing journals for future special issues?",
+     "options": [
+      "Diversity of fields",
+      "Journal metrics (impact factor, JCR)",
+      "History and reputation in the field",
+      "High chance of publication for participants",
+      "Short review process",
+      "Other"
+     ]
+    },
+    {
+     "id": "jsuggest",
+     "type": "text",
+     "text": "Any fields or journals to include in future special issues? (optional)"
+    }
+   ]
+  },
+  {
+   "title": "Conference preferences",
+   "questions": [
+    {
+     "id": "factors",
+     "type": "multi",
+     "text": "The two most important factors when you decide to attend a conference (choose up to 2)",
+     "options": [
+      "Topics",
+      "Location",
+      "Registration fee",
+      "Networking opportunities",
+      "Quality of special issues",
+      "Speakers",
+      "Conference size",
+      "Other"
+     ],
+     "max": 2
+    },
+    {
+     "id": "strengths",
+     "type": "multi",
+     "text": "The two greatest strengths of MCARE 2026 compared with other conferences (choose up to 2)",
+     "options": [
+      "Topics",
+      "Location",
+      "Registration fee",
+      "Networking opportunities",
+      "Quality of special issues",
+      "Speakers",
+      "Conference size",
+      "Other"
+     ],
+     "max": 2
+    },
+    {
+     "id": "weaknesses",
+     "type": "multi",
+     "text": "The two main weaknesses of MCARE 2026 compared with other conferences (choose up to 2)",
+     "options": [
+      "Topics",
+      "Location",
+      "Registration fee",
+      "Networking opportunities",
+      "Quality of special issues",
+      "Speakers",
+      "Conference size",
+      "Other"
+     ],
+     "max": 2
+    },
+    {
+     "id": "nextmcare",
+     "type": "rating",
+     "text": "How likely are you to attend the next MCARE?",
+     "lo": "Very unlikely",
+     "hi": "Very likely",
+     "required": true,
+     "na": false
     },
     {
      "id": "improve",
      "type": "text",
-     "text": "One thing we should improve next time (optional)"
+     "text": "Any suggestions for improving the conference? (optional)"
+    }
+   ]
+  },
+  {
+   "title": "Symposium organizer for the next MCARE (optional)",
+   "separate": true,
+   "note": "The organizing committee welcomes proposals for new topics and symposium organizers. Fill this in only if you are interested. These details are stored separately from your answers above, so your feedback stays anonymous.",
+   "questions": [
+    {
+     "id": "org_last",
+     "type": "short",
+     "text": "Last name"
+    },
+    {
+     "id": "org_first",
+     "type": "short",
+     "text": "First name"
+    },
+    {
+     "id": "org_affil",
+     "type": "short",
+     "text": "Affiliation"
+    },
+    {
+     "id": "org_position",
+     "type": "short",
+     "text": "Position"
+    },
+    {
+     "id": "org_email",
+     "type": "short",
+     "text": "Email",
+     "format": "email"
+    },
+    {
+     "id": "org_topic",
+     "type": "text",
+     "text": "Proposed topic (optional)"
     }
    ]
   }
- ],
- "gift": {
-  "title": "Your gift code",
-  "text": "Show this QR code at the registration desk to collect your thank-you gift (one per person, while stocks last).",
-  "claimPage": "https://soorathep.github.io/mcare2026/claim.html"
- }
+ ]
 }

@@ -17,17 +17,10 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8000",
 ];
 
-// Must match data/survey.json
-const QUESTIONS = {
-  role: { type: "choice", options: ["Student", "Academic", "Industry", "Government", "Other"], required: true },
-  first: { type: "choice", options: ["Yes", "No"], required: true },
-  plenary: { type: "rating" }, symposia: { type: "rating" }, posters: { type: "rating" },
-  registration: { type: "rating" }, timekeeping: { type: "rating" }, information: { type: "rating" },
-  rooms: { type: "rating" }, meals: { type: "rating" }, banquet: { type: "rating" },
-  overall: { type: "rating", required: true, na: false },
-  nps: { type: "nps", required: true },
-  best: { type: "text" }, improve: { type: "text" },
-};
+// BEGIN QUESTIONS (generated from data/survey.json by tools/build.py; do not edit by hand)
+const QUESTIONS = {"inst": {"type": "choice", "options": ["University", "Research institute", "Industry", "Other"], "required": true}, "position": {"type": "choice", "options": ["Principal investigator (professor, PI)", "Full-time researcher (postdoc, research staff)", "Student", "Other"], "required": true}, "region": {"type": "choice", "options": ["Thailand", "South Korea", "Asia (other)", "Europe", "Americas", "Africa", "Oceania"], "required": true}, "times": {"type": "choice", "options": ["Once", "Twice", "Three times or more"], "required": true}, "roles": {"type": "multi", "options": ["Organizing committee", "Symposium organizer", "Oral presenter", "Poster presenter", "Other participant"]}, "fields": {"type": "multi", "options": ["Materials science", "Nanotechnology", "Energy", "Electrochemistry", "Chemical engineering", "Process engineering", "Environmental engineering", "Biotechnology", "Chemistry", "Physics", "Catalysis", "Other"], "max": 2}, "overall": {"type": "rating", "required": true, "na": false}, "location": {"type": "rating"}, "venue": {"type": "rating"}, "nextloc": {"type": "choice", "options": ["Jeju, South Korea", "Busan, South Korea", "Seoul, South Korea", "Bangkok, Thailand", "Shanghai, China", "Hawaii, USA", "Seattle, USA", "Paris, France", "London, UK", "Other"]}, "duration": {"type": "choice", "options": ["Too short (6 days or more)", "Appropriate", "Too long (3 to 4 days)"]}, "fee": {"type": "choice", "options": ["Very reasonable", "Reasonable", "Neutral", "Expensive", "Very expensive"]}, "month": {"type": "choice", "options": ["January to February", "March to April", "May to June", "July to August", "September to October", "November to December"]}, "sessions": {"type": "rating"}, "plenary": {"type": "rating"}, "posters": {"type": "rating"}, "diversity": {"type": "rating"}, "topics": {"type": "text"}, "registration": {"type": "rating"}, "onsite": {"type": "rating"}, "timekeeping": {"type": "rating"}, "information": {"type": "rating"}, "rooms": {"type": "rating"}, "meals": {"type": "rating"}, "banquet": {"type": "rating"}, "best": {"type": "text"}, "worst": {"type": "text"}, "journals": {"type": "rating"}, "jfactor": {"type": "choice", "options": ["Diversity of fields", "Journal metrics (impact factor, JCR)", "History and reputation in the field", "High chance of publication for participants", "Short review process", "Other"]}, "jsuggest": {"type": "text"}, "factors": {"type": "multi", "options": ["Topics", "Location", "Registration fee", "Networking opportunities", "Quality of special issues", "Speakers", "Conference size", "Other"], "max": 2}, "strengths": {"type": "multi", "options": ["Topics", "Location", "Registration fee", "Networking opportunities", "Quality of special issues", "Speakers", "Conference size", "Other"], "max": 2}, "weaknesses": {"type": "multi", "options": ["Topics", "Location", "Registration fee", "Networking opportunities", "Quality of special issues", "Speakers", "Conference size", "Other"], "max": 2}, "nextmcare": {"type": "rating", "required": true, "na": false}, "improve": {"type": "text"}};
+const ORGANIZER = {"org_last": {"type": "short"}, "org_first": {"type": "short"}, "org_affil": {"type": "short"}, "org_position": {"type": "short"}, "org_email": {"type": "short"}, "org_topic": {"type": "text"}};
+// END QUESTIONS
 const MAX_TEXT = 2000;
 
 // Student staff form (data/staff.json). Slot and role ids are checked by pattern, so the lists can change without editing this file.
@@ -72,9 +65,22 @@ function json(body, status, origin) {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...cors(origin) } });
 }
 
+function validateOrganizer(o) {
+  if (o === undefined) return null;
+  if (!o || typeof o !== "object" || Array.isArray(o)) return "Bad organizer";
+  const c = {};
+  for (const k of Object.keys(o)) {
+    if (!(k in ORGANIZER) || typeof o[k] !== "string") return `Bad organizer field: ${k}`;
+    const v = o[k].trim().slice(0, ORGANIZER[k].type === "text" ? 1000 : 200);
+    if (v) c[k] = v;
+  }
+  if (!c.org_last || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.org_email || "")) return "Organizer: last name and a valid email are needed";
+  return c;
+}
+
 function validate(a) {
   if (!a || typeof a !== "object" || Array.isArray(a)) return "Invalid body";
-  for (const k of Object.keys(a)) if (!(k in QUESTIONS)) return `Unknown field: ${k}`;
+  for (const k of Object.keys(a)) if (!(k in QUESTIONS) && k !== "organizer") return `Unknown field: ${k}`;
   const clean = {};
   for (const [k, q] of Object.entries(QUESTIONS)) {
     const v = a[k];
@@ -92,9 +98,12 @@ function validate(a) {
     } else if (q.type === "nps") {
       if (!Number.isInteger(v) || v < 0 || v > 10) return `Bad value: ${k}`;
       clean[k] = v;
-    } else if (q.type === "text") {
+    } else if (q.type === "multi") {
+      if (!Array.isArray(v) || !v.length || v.some(x => !q.options.includes(x)) || new Set(v).size !== v.length || (q.max && v.length > q.max)) return `Bad value: ${k}`;
+      clean[k] = v;
+    } else if (q.type === "text" || q.type === "short") {
       if (typeof v !== "string") return `Bad value: ${k}`;
-      const t = v.trim().slice(0, MAX_TEXT);
+      const t = v.trim().slice(0, q.type === "short" ? 200 : MAX_TEXT);
       if (t) clean[k] = t;
     }
   }
@@ -115,8 +124,11 @@ export default {
       try { body = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400, origin); }
       const clean = validate(body);
       if (typeof clean === "string") return json({ ok: false, error: clean }, 400, origin);
+      const org = validateOrganizer(body.organizer);
+      if (typeof org === "string") return json({ ok: false, error: org }, 400, origin);
       const now = new Date().toISOString();
       await env.DB.prepare("INSERT INTO responses (created_at, answers) VALUES (?, ?)").bind(now, JSON.stringify(clean)).run();
+      if (org) await env.DB.prepare("INSERT INTO organizers (created_at, data) VALUES (?, ?)").bind(now.slice(0, 10), JSON.stringify(org)).run();
       let code = null;
       for (let i = 0; i < 5 && !code; i++) {
         const c = giftCode();
@@ -130,7 +142,8 @@ export default {
       if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ ok: false, error: "Unauthorized" }, 401, origin);
       const { results } = await env.DB.prepare("SELECT id, created_at, answers FROM responses ORDER BY id").all();
       const g = await env.DB.prepare("SELECT COUNT(*) AS issued, COUNT(claimed_at) AS claimed FROM claims").first();
-      return json({ ok: true, gifts: { issued: g.issued, claimed: g.claimed }, responses: results.map(r => ({ id: r.id, created_at: r.created_at, ...JSON.parse(r.answers) })) }, 200, origin);
+      const o = await env.DB.prepare("SELECT created_at, data FROM organizers ORDER BY id").all();
+      return json({ ok: true, gifts: { issued: g.issued, claimed: g.claimed }, organizers: o.results.map(r => ({ date: r.created_at, ...JSON.parse(r.data) })), responses: results.map(r => ({ id: r.id, created_at: r.created_at, ...JSON.parse(r.answers) })) }, 200, origin);
     }
 
     // ---------- poster judging ----------

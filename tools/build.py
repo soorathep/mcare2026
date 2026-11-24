@@ -59,7 +59,31 @@ def build_survey():
     for src, out in (("survey_template.html", "survey.html"), ("results_template.html", "results.html"), ("claim_template.html", "claim.html")):
         tpl = open(p("src", src), encoding="utf-8").read()
         open(p(out), "w", encoding="utf-8").write(tpl.replace("/*SURVEY*/", js).replace("/*QR*/", qr))
+    sync_worker_questions(sv)
     print(f"Built survey.html, results.html and claim.html: {len(ids)} questions, endpoint {'set' if sv.get('endpoint') else 'NOT SET (preview only)'}")
+
+def sync_worker_questions(sv):
+    """Write the survey questions into worker/worker.js so the Worker validates the same questions."""
+    path = p("worker", "worker.js")
+    if not os.path.exists(path): return
+    main, org = {}, {}
+    for sec in sv["sections"]:
+        for q in sec["questions"]:
+            d = {"type": q["type"]}
+            if q.get("options"): d["options"] = q["options"]
+            if q.get("max"): d["max"] = q["max"]
+            if q.get("required"): d["required"] = True
+            if q.get("na") is False: d["na"] = False
+            (org if sec.get("separate") else main)[q["id"]] = d
+    block = ("// BEGIN QUESTIONS (generated from data/survey.json by tools/build.py; do not edit by hand)\n"
+             f"const QUESTIONS = {json.dumps(main, ensure_ascii=False)};\n"
+             f"const ORGANIZER = {json.dumps(org, ensure_ascii=False)};\n// END QUESTIONS\n")
+    w = open(path, encoding="utf-8").read()
+    import re
+    w2 = re.sub(r"// BEGIN QUESTIONS.*?// END QUESTIONS\n", lambda m: block, w, flags=re.S)
+    if w2 != w:
+        open(path, "w", encoding="utf-8").write(w2)
+        print("Updated worker/worker.js questions: paste the new Worker code into Cloudflare")
 
 def build_judging(program):
     path = p("data", "judging.json")

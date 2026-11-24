@@ -46,7 +46,7 @@ button.ghost{background:#fff;color:var(--ink);border:1px solid var(--mist)}
 var S = JSON.parse(document.getElementById('data').textContent);
 var app = document.getElementById('app');
 var TK = 'mcare2026-admin';
-var GIFTS = null;
+var GIFTS = null, ORGS = [];
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function login(msg){
   app.innerHTML = '<header><h1>Feedback results</h1></header><form class="login" id="lf" method="post" action="#">' +
@@ -63,17 +63,17 @@ function load(tok, remember){
   app.innerHTML = '<div class="msg">Loading...</div>';
   fetch(S.endpoint.replace(/\/$/, '') + '/results', {headers:{Authorization:'Bearer ' + tok}})
     .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j; }); })
-    .then(function(J){ var R = J.responses; GIFTS = J.gifts || null; try { if (remember === true) localStorage.setItem(TK, tok); else if (remember === false) sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
+    .then(function(J){ var R = J.responses; GIFTS = J.gifts || null; ORGS = J.organizers || []; try { if (remember === true) localStorage.setItem(TK, tok); else if (remember === false) sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
     .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Wrong token. Please try again.' : 'Could not load: ' + e.message); });
 }
 function show(R){
   var n = R.length;
-  var nps = R.filter(function(r){ return typeof r.nps === 'number'; });
-  var npsScore = nps.length ? Math.round(100 * (nps.filter(function(r){ return r.nps >= 9; }).length - nps.filter(function(r){ return r.nps <= 6; }).length) / nps.length) : null;
+  var nx = R.filter(function(r){ return typeof r.nextmcare === 'number'; });
+  var nxMean = nx.length ? nx.reduce(function(a,r){ return a + r.nextmcare; }, 0) / nx.length : null;
   var ov = R.filter(function(r){ return typeof r.overall === 'number'; });
   var ovMean = ov.length ? (ov.reduce(function(a,r){ return a + r.overall; }, 0) / ov.length) : null;
   var h = '<header><h1>Feedback results</h1><span style="display:flex;gap:8px"><button class="ghost" id="csv">Download CSV</button><button class="ghost" id="out">Sign out</button></span></header>';
-  h += '<div class="kpis"><div class="kpi"><b>' + n + '</b><span>Responses</span></div><div class="kpi"><b>' + (ovMean == null ? '–' : ovMean.toFixed(2)) + '</b><span>Overall (1 to 5)</span></div><div class="kpi"><b>' + (npsScore == null ? '–' : npsScore) + '</b><span>Net Promoter Score (-100 to 100)</span></div>' + (GIFTS ? '<div class="kpi"><b>' + GIFTS.claimed + '</b><span>Gifts collected (' + GIFTS.issued + ' codes issued)</span></div>' : '') + '</div>';
+  h += '<div class="kpis"><div class="kpi"><b>' + n + '</b><span>Responses</span></div><div class="kpi"><b>' + (ovMean == null ? '–' : ovMean.toFixed(2)) + '</b><span>Overall (1 to 5)</span></div><div class="kpi"><b>' + (nxMean == null ? '–' : nxMean.toFixed(2)) + '</b><span>Likely to attend next MCARE (1 to 5)</span></div>' + (GIFTS ? '<div class="kpi"><b>' + GIFTS.claimed + '</b><span>Gifts collected (' + GIFTS.issued + ' codes issued)</span></div>' : '') + '</div>';
   h += '<div class="card"><h2>Ratings (mean, 1 to 5)</h2>';
   S.sections.forEach(function(s){
     var qs = s.questions.filter(function(q){ return q.type === 'rating'; }); if (!qs.length) return;
@@ -92,15 +92,24 @@ function show(R){
       h += '<div class="r"><span>' + esc(o) + '</span><div class="track"><i style="width:' + (n ? 100 * c / n : 0) + '%"></i></div><b>' + c + '</b></div>'; });
     h += '</div>';
   }); });
-  S.sections.forEach(function(s){ s.questions.filter(function(q){ return q.type === 'text'; }).forEach(function(q){
+  S.sections.forEach(function(s){ s.questions.filter(function(q){ return q.type === 'multi'; }).forEach(function(q){
+    var m = R.filter(function(r){ return Array.isArray(r[q.id]); }).length;
+    var rows = q.options.map(function(o){ return [o, R.filter(function(r){ return Array.isArray(r[q.id]) && r[q.id].indexOf(o) >= 0; }).length]; }).sort(function(a, b){ return b[1] - a[1]; });
+    h += '<div class="card"><h2>' + esc(q.text) + '</h2><p style="margin:0 0 8px;font-size:12px;color:var(--slate)">' + m + ' answered. Bars show the share of those respondents.</p>';
+    rows.forEach(function(x){ h += '<div class="r"><span>' + esc(x[0]) + '</span><div class="track"><i style="width:' + (m ? 100 * x[1] / m : 0) + '%"></i></div><b>' + x[1] + '</b></div>'; });
+    h += '</div>';
+  }); });
+  S.sections.forEach(function(s){ if (s.separate) return; s.questions.filter(function(q){ return q.type === 'text'; }).forEach(function(q){
     var c = R.filter(function(r){ return r[q.id]; });
     h += '<div class="card"><h2>' + esc(q.text) + ' · ' + c.length + '</h2>' + (c.length ? c.map(function(r){ return '<div class="c">' + esc(r[q.id]) + '</div>'; }).join('') : '<div class="c" style="color:var(--slate)">No comments yet.</div>') + '</div>';
   }); });
+  var OQ = []; S.sections.forEach(function(s){ if (s.separate) OQ = s.questions; });
+  if (OQ.length) h += '<div class="card"><h2>Symposium organizer volunteers · ' + ORGS.length + '</h2>' + (ORGS.length ? ORGS.map(function(o){ return '<div class="c"><b>' + esc([o.org_first, o.org_last].filter(Boolean).join(' ')) + '</b>' + (o.org_position ? ', ' + esc(o.org_position) : '') + (o.org_affil ? ', ' + esc(o.org_affil) : '') + '<br>' + esc(o.org_email || '') + (o.org_topic ? '<br><span style="color:var(--slate)">Topic: ' + esc(o.org_topic) + '</span>' : '') + '</div>'; }).join('') : '<div class="c" style="color:var(--slate)">None yet.</div>') + '</div>';
   app.innerHTML = h;
   document.getElementById('out').onclick = function(){ forget(); login(); };
   document.getElementById('csv').onclick = function(){
-    var cols = ['id', 'created_at']; S.sections.forEach(function(s){ s.questions.forEach(function(q){ cols.push(q.id); }); });
-    var cell = function(v){ v = v == null ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var cols = ['id', 'created_at']; S.sections.forEach(function(s){ if (!s.separate) s.questions.forEach(function(q){ cols.push(q.id); }); });
+    var cell = function(v){ v = v == null ? '' : Array.isArray(v) ? v.join('; ') : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     var csv = '﻿' + cols.join(',') + '\n' + R.map(function(r){ return cols.map(function(c){ return cell(r[c]); }).join(','); }).join('\n');
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); a.download = 'mcare2026_feedback.csv'; a.click();
   };

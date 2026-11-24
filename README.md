@@ -32,7 +32,9 @@ After building, commit and push. The site updates in about a minute.
 ## Feedback survey
 - Survey: `https://soorathep.github.io/mcare2026/survey.html`
 - Results (admin token): `https://soorathep.github.io/mcare2026/results.html`
-- Questions: `data/survey.json`. Backend: `worker/worker.js` on Cloudflare Workers with a D1 database (`worker/schema.sql`).
+- Questions: `data/survey.json` (based on the MCARE 2024 survey so results can be compared). After editing it, run the build: it also updates the question list inside `worker/worker.js`, which must then be pasted into Cloudflare.
+- Optional symposium organizer contact details are stored in a separate table (`organizers`), not with the answers.
+- Questions file: Backend: `worker/worker.js` on Cloudflare Workers with a D1 database (`worker/schema.sql`).
 - The live app shows a feedback card from `showInAppFrom` (16 Dec).
 - Gift: after submitting, each respondent gets a 6-character code and QR (not linked to the answers). Desk staff scan it with a phone camera; it opens `https://soorathep.github.io/mcare2026/claim.html`, which needs the `DESK_TOKEN` Cloudflare secret and blocks a second claim.
 
