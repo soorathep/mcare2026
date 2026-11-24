@@ -47,7 +47,7 @@ After building, commit and push. The site updates in about a minute.
 
 ## Student staff
 - Sign-up form (Thai): `https://soorathep.github.io/mcare2026/staff.html`. Signing up again with the same email updates the record
-- Organizer view (admin token): `https://soorathep.github.io/mcare2026/staff-admin.html`, availability heatmap for meetings, contact list, shirt sizes, CSV
+- Organizer view (`ADMIN_TOKEN`, or `STAFF_TOKEN` for team members; the staff token opens only this page): `https://soorathep.github.io/mcare2026/staff-admin.html`, availability heatmap for meetings, contact list, shirt sizes, CSV
 - Options (levels, shirt sizes, time slots, roles): `data/staff.json`
 
 ## Poster area

@@ -54,7 +54,7 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(
 function login(msg){
   app.innerHTML = '<header><h1>Student staff / นิสิตช่วยงาน</h1></header><form class="login" id="lf" method="post" action="#">' +
     '<input type="text" name="username" autocomplete="username" value="mcare2026-admin" readonly style="display:none">' +
-    '<label for="tok"><b>Admin token</b></label><input id="tok" name="password" type="password" autocomplete="current-password">' +
+    '<label for="tok"><b>รหัสผ่าน / Password</b> <span style="font-weight:400;color:#66727C">(staff token or admin token)</span></label><input id="tok" name="password" type="password" autocomplete="current-password">' +
     '<button type="submit">แสดงรายชื่อ / Show list</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</form>';
   document.getElementById('lf').onsubmit = function(e){ e.preventDefault(); var t = document.getElementById('tok').value.trim(); if (t) load(t); };
 }

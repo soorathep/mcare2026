@@ -6,7 +6,7 @@
 //           POST /score           save or update one score (X-Judge-Code)
 //           GET  /poster-results  judges and all scores (Authorization: Bearer <ADMIN_TOKEN>)
 // Staff:    POST /staff           student staff sign-up; same email updates the record (public)
-//           GET  /staff-list      all staff records (Authorization: Bearer <ADMIN_TOKEN>)
+//           GET  /staff-list      all staff records (Authorization: Bearer <ADMIN_TOKEN or STAFF_TOKEN>)
 // Gifts:    /submit returns a gift code (not linked to the answers, so the survey stays anonymous)
 //           POST /claim           mark a gift code as collected (X-Desk-Token: <DESK_TOKEN>)
 //           GET  /claim-stats     codes issued and collected (X-Desk-Token)
@@ -227,8 +227,11 @@ export default {
       return json({ ok: true, updated: !!old }, 200, origin);
     }
     if (url.pathname === "/staff-list" && request.method === "GET") {
+      // ADMIN_TOKEN, or STAFF_TOKEN for team members who should see only the staff list
       const auth = request.headers.get("Authorization") || "";
-      if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ ok: false, error: "Unauthorized" }, 401, origin);
+      const okAdmin = env.ADMIN_TOKEN && auth === `Bearer ${env.ADMIN_TOKEN}`;
+      const okStaff = env.STAFF_TOKEN && auth === `Bearer ${env.STAFF_TOKEN}`;
+      if (!okAdmin && !okStaff) return json({ ok: false, error: "Unauthorized" }, 401, origin);
       const { results } = await env.DB.prepare("SELECT email, created_at, updated_at, data FROM staff ORDER BY created_at").all();
       return json({ ok: true, staff: results.map(r => ({ ...JSON.parse(r.data), created_at: r.created_at, updated_at: r.updated_at })) }, 200, origin);
     }
