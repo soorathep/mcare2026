@@ -688,7 +688,7 @@ function viewMap(){
   var p = PSES[Q.get('map')] || D.posterSessions[0];
   var target = Q.get('b') || '';
   var h = '<header class="whdr" style="border-top:6px solid var(--ink)">' + backLink(href({posters: p.id}), 'Poster Session ' + p.id) +
-    '<div><h1 style="font-size:28px">Poster floor map</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(D.meta.posterArea) + ' · ' + Math.ceil(p.count / 2) + ' panels · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + '</div></div>' +
+    '<div><h1 style="font-size:28px">Poster floor map</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(D.meta.posterArea) + ' · ' + Math.ceil(p.count / 2) + (D.meta.panelsTotal ? ' of ' + D.meta.panelsTotal : '') + ' panels · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + '</div></div>' +
     '<label class="search">' + IC.search + '<span class="sr">Find a board number</span><input type="search" id="mq" inputmode="numeric" placeholder="Find a board number, e.g. 14" value="' + esc(target ? boardNum(target) : '') + '" autocomplete="off"></label></header>' +
     '<div id="mapwrap"></div>';
   setTimeout(function(){
@@ -704,7 +704,7 @@ function drawMap(p, n){
   var h = '<div class="stack" style="padding-top:16px"><div class="card" style="padding:14px 12px;gap:10px"><div style="display:flex;justify-content:center"><span class="tag">Ballroom doors</span></div><div class="map">';
   for (var r = 0; r < rows; r++) {
     var a = r * PER_ROW + 1, b = Math.min(p.count, (r + 1) * PER_ROW), L = String.fromCharCode(65 + r);
-    h += '<div><div class="mrow-h"><b>Row ' + L + '</b><span class="g" style="font-size:11px">' + bid(p.id, a) + ' to ' + bid(p.id, b) + '</span></div><div class="panels">';
+    h += '<div><div class="mrow-h"><b>Row ' + L + '</b><span class="g" style="font-size:11px">' + bid(p.id, a) + ' to ' + bid(p.id, b) + '</span></div><div class="panels" style="grid-template-columns:repeat(' + half + ',minmax(0,1fr))">';
     for (var k = 0; k < half; k++) {
       var top = a + k * 2, bot = top + 1;
       if (top > p.count) { h += '<div class="panel empty"><span></span><span></span></div>'; continue; }

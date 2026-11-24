@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MCARE 2026 รายชื่อนิสิตช่วยงาน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0F6E6B;--amber:#E29A2D;--rust:#BE654C;--ink:#1C242B;--graphite:#333F4A;--slate:#66727C;--mist:#B9C1C6;--paper:#F3F0EB;--line:#E6E2DA;--soft:#F7F5F1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;line-height:1.45}
+.wrap{max-width:980px;margin:0 auto;padding-bottom:40px}
+header{background:var(--ink);color:#fff;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-family:"Space Grotesk","IBM Plex Sans Thai",sans-serif;font-size:24px}
+.login{margin:24px 16px;background:#fff;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px}
+input{min-height:44px;border:1px solid var(--mist);border-radius:10px;padding:0 12px;font:400 15px "IBM Plex Sans Thai",sans-serif}
+button{min-height:40px;border:0;border-radius:10px;background:var(--teal);color:#fff;font:600 14px "IBM Plex Sans Thai",sans-serif;padding:0 14px;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--mist)}
+.kpis{display:flex;flex-wrap:wrap;gap:10px;padding:16px 16px 0}
+.kpi{background:#fff;border-radius:12px;padding:12px 16px;display:flex;flex-direction:column}
+.kpi b{font-family:"Space Grotesk",sans-serif;font-size:26px}
+.kpi span{font-size:12px;font-weight:600;color:var(--graphite)}
+.card{margin:12px 16px 0;background:#fff;border-radius:14px;padding:16px;overflow-x:auto}
+.card h2{margin:0 0 4px;font-size:14px;font-weight:700;color:var(--teal)}
+.hint{font-size:13px;color:var(--slate);margin:0 0 10px}
+table.hm{border-collapse:separate;border-spacing:4px;font-size:13px}
+table.hm th{font-weight:600;color:var(--graphite);padding:2px 6px;text-align:center;white-space:nowrap}
+table.hm th.r{text-align:left}
+table.hm td button{width:64px;min-height:40px;border-radius:8px;font:700 15px "Space Grotesk",sans-serif;padding:0}
+table.hm td button.sel{outline:3px solid var(--amber);outline-offset:1px}
+.who{margin-top:10px;padding:12px;background:var(--soft);border-radius:10px;font-size:14px;display:none}
+.who b{color:var(--teal)}
+table.list{border-collapse:collapse;width:100%;font-size:13px;min-width:860px}
+table.list th{text-align:left;font-weight:700;color:var(--graphite);border-bottom:2px solid var(--line);padding:6px}
+table.list td{border-bottom:1px solid var(--line);padding:6px;vertical-align:top}
+table.list td small{color:var(--slate)}
+.msg{margin:16px;color:var(--graphite);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="data" type="application/json">{"title":"MCARE 2026 นิสิตช่วยงาน","intro":"กรอกข้อมูลเพื่อใช้ติดต่อและนัดประชุมทีมช่วยงาน MCARE 2026 (14 ถึง 18 ธ.ค. 2569, Millennium Hilton Bangkok) ใช้เวลาประมาณ 3 นาที ถ้าต้องการแก้ไข ให้กรอกใหม่ด้วยอีเมลเดิม ระบบจะบันทึกทับข้อมูลเดิม","endpoint":"https://mcare2026-survey.ecs-thailand-election.workers.dev","levels":["ป.ตรี ปี 1","ป.ตรี ปี 2","ป.ตรี ปี 3","ป.ตรี ปี 4","ป.โท","ป.เอก","อื่น ๆ"],"shirts":["S","M","L","XL","2XL","3XL"],"meetDays":[["mon","จ."],["tue","อ."],["wed","พ."],["thu","พฤ."],["fri","ศ."],["sat","ส."],["sun","อา."]],"meetTimes":[["am","เช้า 9:00 ถึง 12:00"],["pm","บ่าย 13:00 ถึง 16:00"],["ev","เย็น 17:00 ถึง 19:00"]],"eventDays":[["d13","อา. 13 ธ.ค. (เตรียมงาน)"],["d14","จ. 14 ธ.ค."],["d15","อ. 15 ธ.ค."],["d16","พ. 16 ธ.ค."],["d17","พฤ. 17 ธ.ค."],["d18","ศ. 18 ธ.ค."]],"eventTimes":[["am","เช้า"],["pm","บ่าย"],["ev","ค่ำ"]],"roles":[["reg","โต๊ะลงทะเบียน"],["room","ประจำห้องบรรยาย (จับเวลา, ไมค์, laptop)"],["poster","ดูแลโปสเตอร์"],["vip","ต้อนรับ VIP และวิทยากร"],["photo","ถ่ายภาพหรือวิดีโอ"],["it","IT และเว็บ"],["any","ได้ทุกงาน"]],"consent":"ยินยอมให้ใช้ข้อมูลนี้เพื่อประสานงาน MCARE 2026 เท่านั้น ข้อมูลจะถูกลบหลังจบงาน"}</script>
+<script>
+(function(){
+"use strict";
+var S = JSON.parse(document.getElementById('data').textContent);
+var app = document.getElementById('app');
+var TK = 'mcare2026-admin';
+var R = [];
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function login(msg){
+  app.innerHTML = '<header><h1>นิสิตช่วยงาน</h1></header><form class="login" id="lf" method="post" action="#">' +
+    '<input type="text" name="username" autocomplete="username" value="mcare2026-admin" readonly style="display:none">' +
+    '<label for="tok"><b>Admin token</b></label><input id="tok" name="password" type="password" autocomplete="current-password">' +
+    '<button type="submit">แสดงรายชื่อ</button>' + (msg ? '<div class="msg">' + esc(msg) + '</div>' : '') + '</form>';
+  document.getElementById('lf').onsubmit = function(e){ e.preventDefault(); var t = document.getElementById('tok').value.trim(); if (t) load(t); };
+}
+function tok(){ try { return localStorage.getItem(TK) || sessionStorage.getItem(TK); } catch(e){ return null; } }
+function forget(){ try { localStorage.removeItem(TK); sessionStorage.removeItem(TK); } catch(e){} }
+function load(t){
+  app.innerHTML = '<div class="msg">กำลังโหลด...</div>';
+  fetch(S.endpoint.replace(/\/$/, '') + '/staff-list', {headers: {Authorization: 'Bearer ' + t}})
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j.staff; }); })
+    .then(function(list){ try { localStorage.setItem(TK, t); } catch(e){} R = list; show(); })
+    .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Token ไม่ถูกต้อง' : 'โหลดไม่สำเร็จ: ' + e.message); });
+}
+function label(list, id){ for (var i = 0; i < list.length; i++) if (list[i][0] === id) return list[i][1]; return id; }
+function slotName(rows, cols, id){ var p = id.split('_'); return label(rows, p[0]) + ' ' + label(cols, p[1]); }
+function nm(r){ return r.name + (r.nick ? ' (' + r.nick + ')' : ''); }
+function heat(key, rows, cols, title, hint){
+  var max = 1;
+  rows.forEach(function(r){ cols.forEach(function(c){ var n = R.filter(function(x){ return (x[key] || []).indexOf(r[0] + '_' + c[0]) >= 0; }).length; if (n > max) max = n; }); });
+  var h = '<div class="card"><h2>' + title + '</h2><p class="hint">' + hint + '</p><table class="hm"><thead><tr><th></th>' + cols.map(function(c){ return '<th>' + esc(c[1].split(' ')[0]) + '</th>'; }).join('') + '</tr></thead><tbody>';
+  rows.forEach(function(r){
+    h += '<tr><th class="r">' + esc(r[1]) + '</th>' + cols.map(function(c){
+      var id = r[0] + '_' + c[0], n = R.filter(function(x){ return (x[key] || []).indexOf(id) >= 0; }).length, a = n / max;
+      var bg = n ? 'rgba(15,110,107,' + (0.15 + 0.85 * a).toFixed(2) + ')' : '#F7F5F1', fg = a > 0.5 ? '#fff' : '#1C242B';
+      return '<td><button data-k="' + key + '" data-id="' + id + '" style="background:' + bg + ';color:' + fg + '" aria-label="' + esc(r[1] + ' ' + c[1]) + ': ' + n + ' คน">' + n + '</button></td>';
+    }).join('') + '</tr>';
+  });
+  return h + '</tbody></table><div class="who" id="who-' + key + '"></div></div>';
+}
+function show(){
+  var shirts = {}; R.forEach(function(r){ if (r.shirt) shirts[r.shirt] = (shirts[r.shirt] || 0) + 1; });
+  var h = '<header><h1>นิสิตช่วยงาน</h1><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" id="cl">คัดลอก LINE ID ทั้งหมด</button><button class="ghost" id="ce">คัดลอกอีเมลทั้งหมด</button><button class="ghost" id="csv">ดาวน์โหลด CSV</button><button class="ghost" id="out">ออกจากระบบ</button></span></header>';
+  h += '<div class="kpis"><div class="kpi"><b>' + R.length + '</b><span>นิสิตที่กรอกแล้ว</span></div>' +
+    S.shirts.map(function(s){ return '<div class="kpi"><b>' + (shirts[s] || 0) + '</b><span>เสื้อ ' + s + '</span></div>'; }).join('') + '</div>';
+  h += heat('meet', S.meetDays, S.meetTimes, 'เวลาที่สะดวกประชุม (จำนวนคนที่ว่าง)', 'กดช่องเพื่อดูว่าใครว่าง และใครไม่ว่าง ช่องสีเข้มคือช่วงที่ว่างพร้อมกันมากที่สุด');
+  h += heat('event', S.eventDays, S.eventTimes, 'วันที่ช่วยงานได้ (จำนวนคน)', 'กดช่องเพื่อดูรายชื่อ');
+  h += '<div class="card"><h2>รายชื่อ</h2><table class="list"><thead><tr><th>ชื่อ</th><th>ระดับ</th><th>โทร</th><th>LINE</th><th>อีเมล</th><th>งานที่สนใจ</th><th>เสื้อ</th><th>อาหาร / หมายเหตุ</th></tr></thead><tbody>' +
+    R.map(function(r){ return '<tr><td><b>' + esc(nm(r)) + '</b><br><small>' + esc([r.sid, r.dept].filter(Boolean).join(' · ')) + '</small></td><td>' + esc(r.level) + '</td><td>' + esc(r.phone) + '</td><td>' + esc(r.line) + '</td><td>' + esc(r.email) + '</td><td>' + esc((r.roles || []).map(function(x){ return label(S.roles, x).split(' (')[0]; }).join(', ')) + (r.lang ? '<br><small>ภาษา: ' + esc(r.lang) + '</small>' : '') + '</td><td>' + esc(r.shirt) + '</td><td>' + esc(r.diet) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + '</td></tr>'; }).join('') +
+    '</tbody></table></div>';
+  app.innerHTML = h;
+  [].forEach.call(app.querySelectorAll('table.hm button'), function(b){ b.onclick = function(){ pick(b); }; });
+  document.getElementById('out').onclick = function(){ forget(); login(''); };
+  document.getElementById('csv').onclick = csv;
+  document.getElementById('cl').onclick = function(){ copy(R.map(function(r){ return nm(r) + ': ' + r.line; }).join('\n'), this); };
+  document.getElementById('ce').onclick = function(){ copy(R.map(function(r){ return r.email; }).join(', '), this); };
+}
+function pick(b){
+  var key = b.getAttribute('data-k'), id = b.getAttribute('data-id');
+  [].forEach.call(app.querySelectorAll('button[data-k="' + key + '"]'), function(x){ x.classList.toggle('sel', x === b); });
+  var rows = key === 'meet' ? S.meetDays : S.eventDays, cols = key === 'meet' ? S.meetTimes : S.eventTimes;
+  var yes = R.filter(function(x){ return (x[key] || []).indexOf(id) >= 0; }), no = R.filter(function(x){ return yes.indexOf(x) < 0; });
+  var w = document.getElementById('who-' + key); w.style.display = 'block';
+  w.innerHTML = '<b>' + esc(slotName(rows, cols, id)) + '</b><br>ว่าง ' + yes.length + ' คน: ' + (esc(yes.map(nm).join(', ')) || '-') + '<br><span style="color:#66727C">ไม่ว่าง ' + no.length + ' คน: ' + (esc(no.map(nm).join(', ')) || '-') + '</span>';
+}
+function copy(s, btn){
+  var t = btn.textContent;
+  (navigator.clipboard ? navigator.clipboard.writeText(s) : Promise.reject()).then(function(){ btn.textContent = 'คัดลอกแล้ว'; setTimeout(function(){ btn.textContent = t; }, 1500); }, function(){ prompt('คัดลอกข้อความนี้', s); });
+}
+function csv(){
+  var cols = ['name','nick','sid','level','dept','phone','line','email','shirt','roles','lang','diet','note','meet','event','updated_at'];
+  var q = function(v){ v = Array.isArray(v) ? v.join(' ') : (v == null ? '' : String(v)); return '"' + v.replace(/"/g, '""') + '"'; };
+  var s = '﻿' + cols.join(',') + '\n' + R.map(function(r){ return cols.map(function(c){ return q(r[c]); }).join(','); }).join('\n');
+  var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([s], {type: 'text/csv'})); a.download = 'mcare2026-staff.csv'; a.click();
+}
+var t = tok(); if (t) load(t); else login('');
+})();
+</script>
+</body>
+</html>

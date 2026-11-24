@@ -29,6 +29,7 @@ def build():
     build_tasks()
     build_survey()
     build_judging(data)
+    build_staff()
     print(f"Built index.html ({len(out)//1024} KB): {len(data['sessions'])} sessions, "
           f"{len(data['talks'])} talks, {len(data['posters'])} posters")
 
@@ -77,6 +78,21 @@ def build_judging(program):
         tpl = open(p("src", src), encoding="utf-8").read()
         open(p(out), "w", encoding="utf-8").write(tpl.replace("/*JUDGING*/", js))
     print(f"Built judge.html and poster-results.html: {len(ids)} criteria, {len(payload['posters'])} posters")
+
+def build_staff():
+    path = p("data", "staff.json")
+    if not os.path.exists(path): return
+    st = json.load(open(path, encoding="utf-8"))
+    import re
+    for k in ("meetDays", "meetTimes", "eventDays", "eventTimes", "roles"):
+        ids = [x[0] for x in st[k]]
+        if len(ids) != len(set(ids)) or not all(re.fullmatch(r"[a-z0-9]{1,8}", i) for i in ids):
+            sys.exit(f"staff.json: ids in {k} must be unique, lowercase letters or digits")
+    js = json.dumps(st, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    for src, out in (("staff_template.html", "staff.html"), ("staff_admin_template.html", "staff-admin.html")):
+        tpl = open(p("src", src), encoding="utf-8").read()
+        open(p(out), "w", encoding="utf-8").write(tpl.replace("/*STAFF*/", js))
+    print("Built staff.html and staff-admin.html")
 
 def serve(port=8000):
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=ROOT)

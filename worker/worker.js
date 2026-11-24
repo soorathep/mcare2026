@@ -5,6 +5,8 @@
 // Judging:  GET  /judge           judge name, assigned boards, own scores (X-Judge-Code)
 //           POST /score           save or update one score (X-Judge-Code)
 //           GET  /poster-results  judges and all scores (Authorization: Bearer <ADMIN_TOKEN>)
+// Staff:    POST /staff           student staff sign-up; same email updates the record (public)
+//           GET  /staff-list      all staff records (Authorization: Bearer <ADMIN_TOKEN>)
 // Criteria live in data/judging.json; the Worker accepts any criterion id, so criteria can change without editing this file.
 
 const ALLOWED_ORIGINS = [
@@ -24,6 +26,29 @@ const QUESTIONS = {
   best: { type: "text" }, improve: { type: "text" },
 };
 const MAX_TEXT = 2000;
+
+// Student staff form (data/staff.json). Slot and role ids are checked by pattern, so the lists can change without editing this file.
+const STAFF_TEXT = { name: 1, nick: 0, sid: 0, level: 1, dept: 0, phone: 1, line: 1, email: 1, shirt: 1, lang: 0, diet: 0, note: 0 };
+const STAFF_LIST = { meet: 1, event: 1, roles: 0 };
+function validateStaff(a) {
+  if (!a || typeof a !== "object" || Array.isArray(a)) return "Invalid body";
+  if (a.consent !== true) return "Consent required";
+  const c = {};
+  for (const [k, req] of Object.entries(STAFF_TEXT)) {
+    const v = typeof a[k] === "string" ? a[k].trim().slice(0, k === "note" ? 1000 : 200) : "";
+    if (!v) { if (req) return `Missing: ${k}`; continue; }
+    c[k] = v;
+  }
+  c.email = c.email.toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email)) return "Bad email";
+  for (const [k, req] of Object.entries(STAFF_LIST)) {
+    const v = a[k] === undefined ? [] : a[k];
+    if (!Array.isArray(v) || v.length > 60 || !v.every(x => typeof x === "string" && /^[a-z0-9_]{1,16}$/.test(x))) return `Bad value: ${k}`;
+    if (req && !v.length) return `Missing: ${k}`;
+    c[k] = [...new Set(v)];
+  }
+  return c;
+}
 
 function cors(origin) {
   const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
@@ -134,6 +159,27 @@ export default {
       return json({ ok: true,
         judges: j.results.map(r => ({ code: r.code, name: r.name, boards: JSON.parse(r.boards) })),
         scores: s.results.map(r => ({ ...r, scores: JSON.parse(r.scores) })) }, 200, origin);
+    }
+
+    // ---------- student staff ----------
+    if (url.pathname === "/staff" && request.method === "POST") {
+      if (origin && !ALLOWED_ORIGINS.includes(origin)) return json({ ok: false, error: "Origin not allowed" }, 403, origin);
+      if (Number(request.headers.get("Content-Length") || 0) > 20000) return json({ ok: false, error: "Too large" }, 413, origin);
+      let body;
+      try { body = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400, origin); }
+      const c = validateStaff(body);
+      if (typeof c === "string") return json({ ok: false, error: c }, 400, origin);
+      const now = new Date().toISOString();
+      const old = await env.DB.prepare("SELECT email FROM staff WHERE email = ?").bind(c.email).first();
+      await env.DB.prepare("INSERT INTO staff (email, created_at, updated_at, data) VALUES (?, ?, ?, ?) ON CONFLICT(email) DO UPDATE SET updated_at = excluded.updated_at, data = excluded.data")
+        .bind(c.email, now, now, JSON.stringify(c)).run();
+      return json({ ok: true, updated: !!old }, 200, origin);
+    }
+    if (url.pathname === "/staff-list" && request.method === "GET") {
+      const auth = request.headers.get("Authorization") || "";
+      if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ ok: false, error: "Unauthorized" }, 401, origin);
+      const { results } = await env.DB.prepare("SELECT email, created_at, updated_at, data FROM staff ORDER BY created_at").all();
+      return json({ ok: true, staff: results.map(r => ({ ...JSON.parse(r.data), created_at: r.created_at, updated_at: r.updated_at })) }, 200, origin);
     }
 
     return json({ ok: false, error: "Not found" }, 404, origin);

@@ -12,9 +12,12 @@ Served by GitHub Pages at https://soorathep.github.io/mcare2026/
 - `src/tasks_template.html` tracker page layout
 - `data/survey.json`, `src/survey_template.html`, `src/results_template.html` feedback survey
 - `data/judging.json`, `src/judge_template.html`, `src/poster_results_template.html` poster judging
-- `worker/` Cloudflare Worker and database schema (survey and poster judging)
+- `data/staff.json`, `src/staff_template.html`, `src/staff_admin_template.html` student staff sign-up
+- `worker/` Cloudflare Worker and database schema (survey, poster judging, staff sign-up)
 - `tools/make_judges.py` assigns judges, creates codes and judge cards (output in `private/`)
-- `tools/build.py` builds `index.html`, `tasks.html`, `survey.html` and `results.html`
+- `tools/import_database.py` imports the organizers' Program Database workbook
+- `tools/build.py` builds all pages
+- `tools/make_sample.py` regenerates the sample data
 
 ## Commands
     python3 tools/build.py --serve    # build and preview at http://localhost:8000
@@ -38,11 +41,19 @@ After building, commit and push. The site updates in about a minute.
 - Judges: put `name,session` rows in `private/judges.csv`, run `python3 tools/make_judges.py`, paste `private/judges_seed.sql` into the D1 Console, print `private/judge_cards.html`
 - `private/` is in `.gitignore`: judge codes never go to GitHub
 
+## Student staff
+- Sign-up form (Thai): `https://soorathep.github.io/mcare2026/staff.html`. Signing up again with the same email updates the record
+- Organizer view (admin token): `https://soorathep.github.io/mcare2026/staff-admin.html`, availability heatmap for meetings, contact list, shirt sizes, CSV
+- Options (levels, shirt sizes, time slots, roles): `data/staff.json`
+
+## Poster area
+- `meta.panelsTotal` (60 double-sided panels) and `meta.panelsPerRow` (10) in program.json set the floor map
+
 ## URLs for QR codes
 - Main: `https://soorathep.github.io/mcare2026/`
 - Room: `?room=ab`, `c`, `yangtze`, `amazon`, `seine`, `ganges`, `mekong`, `nile`
 - Room TV display: `?room=yangtze&display=1`
-- Poster board: `?poster=2-014&src=qr`
+- Poster board: `?poster=P2-014&src=qr`
 - Simulated time (testing): `?now=2026-12-17T14:32`
 
 Before 14 Dec the site runs in demo mode automatically (`meta.demo` in program.json).

@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-23",
+ "updated": "2026-11-24",
  "categories": [
   "Program and slides",
   "Posters",
@@ -330,8 +330,35 @@
    "category": "Posters",
    "owner": "Program team",
    "due": "2026-12-04",
+   "status": "done",
+   "note": "24 Nov: budget sheet lists 60 double-sided panels (120 boards), so all 109 Round 2 posters fit. Web map updated to 60 panels, 10 per row (assumed until the floor plan arrives)"
+  },
+  {
+   "id": 37,
+   "title": "Send the final Program book file to the printer (at least 2 weeks before the event)",
+   "category": "Program and slides",
+   "owner": "Program team",
+   "due": "2026-11-30",
    "status": "todo",
-   "note": "Board P2-109 currently has no place on the layout"
+   "note": "From the budget sheet: A4, 50 pages, 700 copies. Session chairs (due 27 Nov) must be in the file"
+  },
+  {
+   "id": 38,
+   "title": "Student staff sign up via staff.html (contact, shirt size, meeting and event availability)",
+   "category": "Student staff",
+   "owner": "Soorathep",
+   "due": "2026-11-28",
+   "status": "todo",
+   "note": "Organizer view: staff-admin.html (admin token). Shirt sizes feed the 35 staff T-shirts"
+  },
+  {
+   "id": 39,
+   "title": "Decide how survey respondents collect the bag and pen souvenir (500 sets)",
+   "category": "Web app and QR",
+   "owner": "Soorathep",
+   "due": "2026-12-04",
+   "status": "todo",
+   "note": "Survey card currently appears from 18 Dec; consider opening it earlier and adding a confirmation screen to show at the desk"
   }
  ]
 }
