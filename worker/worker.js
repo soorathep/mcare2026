@@ -7,6 +7,9 @@
 //           GET  /poster-results  judges and all scores (Authorization: Bearer <ADMIN_TOKEN>)
 // Staff:    POST /staff           student staff sign-up; same email updates the record (public)
 //           GET  /staff-list      all staff records (Authorization: Bearer <ADMIN_TOKEN>)
+// Gifts:    /submit returns a gift code (not linked to the answers, so the survey stays anonymous)
+//           POST /claim           mark a gift code as collected (X-Desk-Token: <DESK_TOKEN>)
+//           GET  /claim-stats     codes issued and collected (X-Desk-Token)
 // Criteria live in data/judging.json; the Worker accepts any criterion id, so criteria can change without editing this file.
 
 const ALLOWED_ORIGINS = [
@@ -50,12 +53,18 @@ function validateStaff(a) {
   return c;
 }
 
+const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // no 0/O/1/I
+function giftCode() {
+  const b = new Uint8Array(6); crypto.getRandomValues(b);
+  return Array.from(b, x => CODE_CHARS[x % CODE_CHARS.length]).join("");
+}
+
 function cors(origin) {
   const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allow,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Judge-Code",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Judge-Code, X-Desk-Token",
     "Vary": "Origin",
   };
 }
@@ -106,16 +115,22 @@ export default {
       try { body = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400, origin); }
       const clean = validate(body);
       if (typeof clean === "string") return json({ ok: false, error: clean }, 400, origin);
-      await env.DB.prepare("INSERT INTO responses (created_at, answers) VALUES (?, ?)")
-        .bind(new Date().toISOString(), JSON.stringify(clean)).run();
-      return json({ ok: true }, 200, origin);
+      const now = new Date().toISOString();
+      await env.DB.prepare("INSERT INTO responses (created_at, answers) VALUES (?, ?)").bind(now, JSON.stringify(clean)).run();
+      let code = null;
+      for (let i = 0; i < 5 && !code; i++) {
+        const c = giftCode();
+        try { await env.DB.prepare("INSERT INTO claims (code, created_at) VALUES (?, ?)").bind(c, now).run(); code = c; } catch (e) { /* rare collision: try again */ }
+      }
+      return json({ ok: true, code }, 200, origin);
     }
 
     if (url.pathname === "/results" && request.method === "GET") {
       const auth = request.headers.get("Authorization") || "";
       if (!env.ADMIN_TOKEN || auth !== `Bearer ${env.ADMIN_TOKEN}`) return json({ ok: false, error: "Unauthorized" }, 401, origin);
       const { results } = await env.DB.prepare("SELECT id, created_at, answers FROM responses ORDER BY id").all();
-      return json({ ok: true, responses: results.map(r => ({ id: r.id, created_at: r.created_at, ...JSON.parse(r.answers) })) }, 200, origin);
+      const g = await env.DB.prepare("SELECT COUNT(*) AS issued, COUNT(claimed_at) AS claimed FROM claims").first();
+      return json({ ok: true, gifts: { issued: g.issued, claimed: g.claimed }, responses: results.map(r => ({ id: r.id, created_at: r.created_at, ...JSON.parse(r.answers) })) }, 200, origin);
     }
 
     // ---------- poster judging ----------
@@ -159,6 +174,29 @@ export default {
       return json({ ok: true,
         judges: j.results.map(r => ({ code: r.code, name: r.name, boards: JSON.parse(r.boards) })),
         scores: s.results.map(r => ({ ...r, scores: JSON.parse(r.scores) })) }, 200, origin);
+    }
+
+    // ---------- survey gifts ----------
+    if (url.pathname === "/claim" || url.pathname === "/claim-stats") {
+      const desk = request.headers.get("X-Desk-Token") || "";
+      if (!env.DESK_TOKEN || desk !== env.DESK_TOKEN) return json({ ok: false, error: "Unauthorized" }, 401, origin);
+      const stats = async () => {
+        const r = await env.DB.prepare("SELECT COUNT(*) AS issued, COUNT(claimed_at) AS claimed FROM claims").first();
+        return { issued: r.issued, claimed: r.claimed };
+      };
+      if (url.pathname === "/claim-stats" && request.method === "GET") return json({ ok: true, ...(await stats()) }, 200, origin);
+      if (url.pathname === "/claim" && request.method === "POST") {
+        let b;
+        try { b = await request.json(); } catch { return json({ ok: false, error: "Invalid JSON" }, 400, origin); }
+        const code = String((b && b.code) || "").trim().toUpperCase();
+        if (!/^[A-Z0-9]{6}$/.test(code)) return json({ ok: false, error: "Invalid code" }, 400, origin);
+        const row = await env.DB.prepare("SELECT code, claimed_at FROM claims WHERE code = ?").bind(code).first();
+        if (!row) return json({ ok: false, error: "Unknown code", ...(await stats()) }, 404, origin);
+        if (row.claimed_at) return json({ ok: false, already: true, claimed_at: row.claimed_at, ...(await stats()) }, 409, origin);
+        const now = new Date().toISOString();
+        await env.DB.prepare("UPDATE claims SET claimed_at = ? WHERE code = ? AND claimed_at IS NULL").bind(now, code).run();
+        return json({ ok: true, claimed_at: now, ...(await stats()) }, 200, origin);
+      }
     }
 
     // ---------- student staff ----------

@@ -19,7 +19,7 @@ h1{margin:0;font-family:"Space Grotesk",Inter,sans-serif;font-size:26px}
 input{min-height:44px;border:1px solid var(--mist);border-radius:10px;padding:0 12px;font:400 15px Inter,sans-serif}
 button{min-height:44px;border:0;border-radius:10px;background:var(--teal);color:#fff;font:600 15px Inter,sans-serif;padding:0 16px;cursor:pointer}
 button.ghost{background:#fff;color:var(--ink);border:1px solid var(--mist)}
-.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:16px 16px 0}
 .kpi{background:#fff;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:2px}
 .kpi b{font-family:"Space Grotesk",Inter,sans-serif;font-size:30px}
 .kpi span{font-size:12px;font-weight:600;color:var(--graphite)}
@@ -46,6 +46,7 @@ button.ghost{background:#fff;color:var(--ink);border:1px solid var(--mist)}
 var S = JSON.parse(document.getElementById('data').textContent);
 var app = document.getElementById('app');
 var TK = 'mcare2026-admin';
+var GIFTS = null;
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function login(msg){
   app.innerHTML = '<header><h1>Feedback results</h1></header><form class="login" id="lf" method="post" action="#">' +
@@ -61,8 +62,8 @@ function load(tok, remember){
   if (!S.endpoint) return login('The survey is not connected to the database yet.');
   app.innerHTML = '<div class="msg">Loading...</div>';
   fetch(S.endpoint.replace(/\/$/, '') + '/results', {headers:{Authorization:'Bearer ' + tok}})
-    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j.responses; }); })
-    .then(function(R){ try { if (remember === true) localStorage.setItem(TK, tok); else if (remember === false) sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j; }); })
+    .then(function(J){ var R = J.responses; GIFTS = J.gifts || null; try { if (remember === true) localStorage.setItem(TK, tok); else if (remember === false) sessionStorage.setItem(TK, tok); } catch(e){} show(R); })
     .catch(function(e){ forget(); login(e.message === 'Unauthorized' ? 'Wrong token. Please try again.' : 'Could not load: ' + e.message); });
 }
 function show(R){
@@ -72,7 +73,7 @@ function show(R){
   var ov = R.filter(function(r){ return typeof r.overall === 'number'; });
   var ovMean = ov.length ? (ov.reduce(function(a,r){ return a + r.overall; }, 0) / ov.length) : null;
   var h = '<header><h1>Feedback results</h1><span style="display:flex;gap:8px"><button class="ghost" id="csv">Download CSV</button><button class="ghost" id="out">Sign out</button></span></header>';
-  h += '<div class="kpis"><div class="kpi"><b>' + n + '</b><span>Responses</span></div><div class="kpi"><b>' + (ovMean == null ? '–' : ovMean.toFixed(2)) + '</b><span>Overall (1 to 5)</span></div><div class="kpi"><b>' + (npsScore == null ? '–' : npsScore) + '</b><span>Net Promoter Score (-100 to 100)</span></div></div>';
+  h += '<div class="kpis"><div class="kpi"><b>' + n + '</b><span>Responses</span></div><div class="kpi"><b>' + (ovMean == null ? '–' : ovMean.toFixed(2)) + '</b><span>Overall (1 to 5)</span></div><div class="kpi"><b>' + (npsScore == null ? '–' : npsScore) + '</b><span>Net Promoter Score (-100 to 100)</span></div>' + (GIFTS ? '<div class="kpi"><b>' + GIFTS.claimed + '</b><span>Gifts collected (' + GIFTS.issued + ' codes issued)</span></div>' : '') + '</div>';
   h += '<div class="card"><h2>Ratings (mean, 1 to 5)</h2>';
   S.sections.forEach(function(s){
     var qs = s.questions.filter(function(q){ return q.type === 'rating'; }); if (!qs.length) return;

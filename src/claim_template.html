@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MCARE 2026 Gift Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0F6E6B;--amber:#E29A2D;--rust:#BE654C;--ink:#1C242B;--graphite:#333F4A;--slate:#66727C;--mist:#B9C1C6;--paper:#F3F0EB;--line:#E6E2DA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.4}
+.wrap{max-width:520px;margin:0 auto;padding-bottom:40px}
+header{background:var(--ink);color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{margin:0;font-family:"Space Grotesk",Inter,sans-serif;font-size:22px}
+.card{margin:14px 16px 0;background:#fff;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+input{min-height:52px;border:1px solid var(--mist);border-radius:10px;padding:0 14px;font:600 22px "Space Grotesk",Inter,monospace;letter-spacing:.15em;text-transform:uppercase;width:100%}
+input[type=password]{font:400 16px Inter,sans-serif;letter-spacing:0;text-transform:none}
+button{min-height:48px;border:0;border-radius:10px;background:var(--teal);color:#fff;font:600 16px Inter,sans-serif;padding:0 16px;cursor:pointer}
+button.ghost{background:transparent;color:#fff;border:1px solid #66727C;min-height:36px;font-size:13px}
+.res{border-radius:16px;padding:26px 18px;text-align:center;color:#fff}
+.res b{display:block;font:700 30px "Space Grotesk",Inter,sans-serif}
+.res span{font-size:16px}
+.ok{background:var(--teal)}
+.dup{background:var(--rust)}
+.bad{background:var(--graphite)}
+.stats{display:flex;gap:10px}
+.stats div{flex:1;background:#fff;border-radius:12px;padding:12px;text-align:center}
+.stats b{display:block;font:700 26px "Space Grotesk",Inter,sans-serif}
+.stats span{font-size:12px;font-weight:600;color:var(--graphite)}
+.hint{font-size:14px;color:var(--slate);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="data" type="application/json">/*SURVEY*/</script>
+<script>
+(function(){
+"use strict";
+var S = JSON.parse(document.getElementById('data').textContent);
+var app = document.getElementById('app');
+var TK = 'mcare2026-desk';
+var API = (S.endpoint || '').replace(/\/$/, '');
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function tok(){ try { return localStorage.getItem(TK) || ''; } catch(e){ return ''; } }
+function codeFromHash(){ var m = /[#&]c=([A-Za-z0-9]{6})/.exec(location.hash); return m ? m[1].toUpperCase() : ''; }
+function tm(iso){ return new Date(iso).toLocaleString('en-GB', {timeZone: 'Asia/Bangkok', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}); }
+
+function login(msg){
+  app.innerHTML = '<header><h1>Gift desk</h1></header><form class="card" id="lf" method="post" action="#">' +
+    '<input type="text" name="username" autocomplete="username" value="mcare2026-desk" readonly style="display:none">' +
+    '<label for="t"><b>Desk token</b></label><input id="t" name="password" type="password" autocomplete="current-password">' +
+    '<button type="submit">Start</button>' + (msg ? '<p class="hint" style="color:#BE654C">' + esc(msg) + '</p>' : '') +
+    '<p class="hint">For staff at the gift desk. Ask the organizer for the desk token.</p></form>';
+  document.getElementById('lf').onsubmit = function(e){ e.preventDefault(); var t = document.getElementById('t').value.trim(); if (!t) return; try { localStorage.setItem(TK, t); } catch(x){} var c = codeFromHash(); if (c) claim(c); else desk(); };
+}
+function desk(result){
+  var h = '<header><h1>Gift desk</h1><button class="ghost" id="out">Sign out</button></header>';
+  if (result) h += '<div class="card" style="padding:0">' + result + '</div>';
+  h += '<div class="stats" style="margin:14px 16px 0"><div><b id="si">–</b><span>Codes issued</span></div><div><b id="sc">–</b><span>Gifts given</span></div></div>';
+  h += '<form class="card" id="cf"><label for="c"><b>Gift code</b></label><input id="c" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234"><button type="submit">Check and give gift</button>' +
+    '<p class="hint">Fastest: scan the attendee\'s QR with this phone\'s camera. The code is checked automatically. Or type the 6-character code.</p></form>';
+  app.innerHTML = h;
+  document.getElementById('out').onclick = function(){ try { localStorage.removeItem(TK); } catch(e){} login(''); };
+  document.getElementById('cf').onsubmit = function(e){ e.preventDefault(); var c = document.getElementById('c').value.trim().toUpperCase(); if (c) claim(c); };
+  stats();
+}
+function stats(){
+  fetch(API + '/claim-stats', {headers: {'X-Desk-Token': tok()}}).then(function(r){ return r.json(); }).then(function(j){
+    if (j.ok) { document.getElementById('si').textContent = j.issued; document.getElementById('sc').textContent = j.claimed; }
+    else if (j.error === 'Unauthorized') { try { localStorage.removeItem(TK); } catch(e){} login('Wrong desk token.'); }
+  }).catch(function(){});
+}
+function claim(code){
+  fetch(API + '/claim', {method: 'POST', headers: {'Content-Type': 'application/json', 'X-Desk-Token': tok()}, body: JSON.stringify({code: code})})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (j.error === 'Unauthorized') { try { localStorage.removeItem(TK); } catch(e){} return login('Wrong desk token.'); }
+      var res = j.ok ? '<div class="res ok"><b>Give the gift</b><span>Code ' + esc(code) + ' is valid. Marked as collected.</span></div>' :
+        j.already ? '<div class="res dup"><b>Already collected</b><span>Code ' + esc(code) + ' was used on ' + esc(tm(j.claimed_at)) + '.</span></div>' :
+        '<div class="res bad"><b>Not valid</b><span>' + esc(j.error === 'Unknown code' ? 'Code ' + code + ' was not issued by the survey.' : (j.error || 'Error')) + '</span></div>';
+      if (navigator.vibrate) navigator.vibrate(j.ok ? 80 : [80, 60, 80]);
+      history.replaceState(null, '', location.pathname);
+      desk(res);
+    })
+    .catch(function(){ desk('<div class="res bad"><b>No connection</b><span>Check the Wi-Fi and try again.</span></div>'); });
+}
+if (!API) { app.innerHTML = '<div class="card">The survey is not connected to the database.</div>'; return; }
+if (!tok()) login(''); else { var c = codeFromHash(); if (c) claim(c); else desk(); }
+window.addEventListener('hashchange', function(){ var c = codeFromHash(); if (c && tok()) claim(c); });
+})();
+</script>
+</body>
+</html>

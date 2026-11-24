@@ -5,3 +5,5 @@ CREATE TABLE IF NOT EXISTS judges (code TEXT PRIMARY KEY, name TEXT NOT NULL, bo
 CREATE TABLE IF NOT EXISTS scores (judge_code TEXT NOT NULL, board TEXT NOT NULL, scores TEXT NOT NULL, total INTEGER NOT NULL, comment TEXT, updated_at TEXT NOT NULL, PRIMARY KEY (judge_code, board));
 -- Student staff sign-up (one row per email; the form fields are stored as JSON)
 CREATE TABLE IF NOT EXISTS staff (email TEXT PRIMARY KEY, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, data TEXT NOT NULL);
+-- Survey gift codes (not linked to responses, so answers stay anonymous)
+CREATE TABLE IF NOT EXISTS claims (code TEXT PRIMARY KEY, created_at TEXT NOT NULL, claimed_at TEXT);

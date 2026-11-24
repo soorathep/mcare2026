@@ -55,10 +55,11 @@ def build_survey():
     ids = [q["id"] for sec in sv["sections"] for q in sec["questions"]]
     if len(ids) != len(set(ids)): sys.exit("survey.json has duplicate question ids")
     js = json.dumps(sv, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    for src, out in (("survey_template.html", "survey.html"), ("results_template.html", "results.html")):
+    qr = open(p("src", "qrcode.js"), encoding="utf-8").read()
+    for src, out in (("survey_template.html", "survey.html"), ("results_template.html", "results.html"), ("claim_template.html", "claim.html")):
         tpl = open(p("src", src), encoding="utf-8").read()
-        open(p(out), "w", encoding="utf-8").write(tpl.replace("/*SURVEY*/", js))
-    print(f"Built survey.html and results.html: {len(ids)} questions, endpoint {'set' if sv.get('endpoint') else 'NOT SET (preview only)'}")
+        open(p(out), "w", encoding="utf-8").write(tpl.replace("/*SURVEY*/", js).replace("/*QR*/", qr))
+    print(f"Built survey.html, results.html and claim.html: {len(ids)} questions, endpoint {'set' if sv.get('endpoint') else 'NOT SET (preview only)'}")
 
 def build_judging(program):
     path = p("data", "judging.json")

@@ -6,7 +6,9 @@
   "Venue and hotel",
   "Meals and dinners",
   "Student staff",
-  "Web app and QR"
+  "Web app and QR",
+  "Printing and supplies",
+  "VIPs and exhibitors"
  ],
  "tasks": [
   {
@@ -214,7 +216,7 @@
    "owner": "Soorathep",
    "due": "2026-12-04",
    "status": "doing",
-   "note": "24 Nov: program database v24 Nov loaded (267 talks, 316 posters) with abstracts and keywords for 581 of 583 items. Still needed: session chairs (promised by 27 Nov), 2 missing abstracts (Jia ZHU, P3-068)"
+   "note": "24 Nov: program database v24 Nov loaded (267 talks, 316 posters) with abstracts and keywords for 581 of 583 items. Still needed: session chairs (promised by 27 Nov), 2 missing abstracts (Jia ZHU, P3-068). Action Plan item 11: search by name and title across all days and posters added 24 Nov"
   },
   {
    "id": 24,
@@ -304,7 +306,7 @@
    "owner": "Soorathep",
    "due": "2026-12-12",
    "status": "todo",
-   "note": "D1 Console: DELETE FROM responses; DELETE FROM scores; then load the real judges"
+   "note": "D1 Console: DELETE FROM responses; DELETE FROM claims; DELETE FROM scores; DELETE FROM staff (only if the staff list is no longer needed); then load the real judges"
   },
   {
    "id": 34,
@@ -344,21 +346,111 @@
   },
   {
    "id": 38,
-   "title": "Student staff sign up via staff.html (contact, shirt size, meeting and event availability)",
+   "title": "Confirm 30 student staff via staff.html: roles, contact list, LINE group, e-mail",
    "category": "Student staff",
    "owner": "Soorathep",
-   "due": "2026-11-28",
+   "due": "2026-11-26",
    "status": "todo",
-   "note": "Organizer view: staff-admin.html (admin token). Shirt sizes feed the 35 staff T-shirts"
+   "note": "Action Plan 23 Nov, item 8 (due 27 Nov): volunteer basis with certificate and meals; fill the table in the PCO docx from staff-admin.html. Organizer view: staff-admin.html"
   },
   {
    "id": 39,
-   "title": "Decide how survey respondents collect the bag and pen souvenir (500 sets)",
+   "title": "Decide how survey respondents collect their gift (about 400 per Action Plan; 500 in the budget sheet)",
    "category": "Web app and QR",
    "owner": "Soorathep",
    "due": "2026-12-04",
+   "status": "doing",
+   "note": "24 Nov: survey now gives each respondent a QR gift code; desk staff scan it on claim.html (desk token) and the system blocks a second claim. Still to decide: gift desk location, desk staff, and when the survey opens in the app (now 18 Dec)"
+  },
+  {
+   "id": 40,
+   "title": "Printing quotation from a local printer, jointly with the PCO",
+   "category": "Printing and supplies",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-25",
    "status": "todo",
-   "note": "Survey card currently appears from 18 Dec; consider opening it earlier and adding a confirmation screen to show at the desk"
+   "note": "Program book 500 (about 50 pages, titles only), name badges 700, QR boards for 8 session rooms, poster number stickers, staff T-shirts 50, bags 700. Action Plan 23 Nov, item 1"
+  },
+  {
+   "id": 41,
+   "title": "Quotation for poster panel rental (at least 60 double-sided panels)",
+   "category": "Posters",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "Dec 17 full day (2 sessions) and Dec 18 half day; 120 boards per session. Thai side advances the cost, secretariat reimburses. Action Plan 23 Nov, item 2"
+  },
+  {
+   "id": 42,
+   "title": "Quotation for IT rental: 13 laptops and 2 printers",
+   "category": "Printing and supplies",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "Thai side advances the cost, secretariat reimburses. Action Plan 23 Nov, item 3"
+  },
+  {
+   "id": 43,
+   "title": "Suggest shops for supplies: USB drives, bells, timers, laser pointers",
+   "category": "Printing and supplies",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "e.g. DAISO at ICONSIAM. Action Plan 23 Nov, item 4"
+  },
+  {
+   "id": 44,
+   "title": "Quotation and quantities for souvenirs",
+   "category": "VIPs and exhibitors",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "About 15 for invited speakers, photo wall, elephant bags, about 400 gifts for survey respondents (unit price to be reconfirmed). Action Plan 23 Nov, item 5"
+  },
+  {
+   "id": 45,
+   "title": "List of Thai VIPs (about 15) for gifts prepared by the Korean side",
+   "category": "VIPs and exhibitors",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "Action Plan 23 Nov, item 6"
+  },
+  {
+   "id": 46,
+   "title": "Thai-Korea researchers networking dinner (Thu 17 Dec): attendee list and venue",
+   "category": "Meals and dinners",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "Korean committee members and advisory board. Action Plan 23 Nov, item 7"
+  },
+  {
+   "id": 47,
+   "title": "Assign a Thai host for Prof. Jones (Plenary) and share flight information",
+   "category": "VIPs and exhibitors",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-11-27",
+   "status": "todo",
+   "note": "Action Plan 23 Nov, item 9"
+  },
+  {
+   "id": 48,
+   "title": "Recruit Thai exhibitors",
+   "category": "VIPs and exhibitors",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-12-04",
+   "status": "todo",
+   "note": "Standard package about THB 65,000 with one complimentary registration; if difficult, about THB 43,000 with one. Starts after 25 Nov. Action Plan 23 Nov, item 10"
+  },
+  {
+   "id": 49,
+   "title": "Schedule the student staff dinner with the student leader",
+   "category": "Student staff",
+   "owner": "CU (Dr. Vipada, Soorathep)",
+   "due": "2026-12-11",
+   "status": "todo",
+   "note": "Monday or Thursday; restaurant near the hotel; THB 1,000 to 1,500 per person. Action Plan 23 Nov, item 12"
   }
  ]
 }

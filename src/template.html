@@ -521,7 +521,7 @@ function viewSchedule(){
     '<div class="days" role="tablist" aria-label="Day">' + D.meta.days.map(function(d){
       return '<a class="day" role="tab" aria-selected="' + (d === day) + '" href="' + href({view:'schedule', day: d}) + '"><span>' + fmtDay(d, {weekday:'short'}).toUpperCase() + '</span><span>' + fmtDay(d, {day:'numeric'}) + '</span></a>';
     }).join('') + '</div>' +
-    '<label class="search">' + IC.search + '<span class="sr">Search talks</span><input type="search" id="q" placeholder="Search speaker, title or keyword" autocomplete="off"></label>' +
+    '<label class="search">' + IC.search + '<span class="sr">Search talks</span><input type="search" id="q" placeholder="Search all days by name or title" autocomplete="off"></label>' +
     '<div class="chips" id="rf"><button type="button" class="fchip" data-room="all" aria-pressed="true">All rooms</button><button type="button" class="fchip" data-room="posters" aria-pressed="false">Posters</button>' +
     D.rooms.map(function(r){ return '<button type="button" class="fchip" data-room="' + r.id + '" aria-pressed="false">' + esc(r.name) + '</button>'; }).join('') + '</div></header>' +
     '<div id="slots"></div>';
@@ -540,6 +540,7 @@ function viewSchedule(){
 }
 function drawSlots(day, scroll){
   var now = nowBkk(), q = schedState.q.trim().toLowerCase(), rf = schedState.room;
+  if (q.length >= 2) return drawSearch(q);
   var items = [];
   if (rf === 'all' || rf === 'posters') D.posterSessions.forEach(function(p){ if (p.day === day) items.push({k:'poster', start: p.display[0], end: p.display[1], p: p}); });
   if (rf === 'all') (D.events || []).forEach(function(e){ if (e.day === day) items.push({k:'event', start: e.start, end: e.end, e: e}); });
@@ -581,6 +582,26 @@ function drawSlots(day, scroll){
   });
   document.getElementById('slots').innerHTML = html;
   if (scroll) { var el = document.getElementById('nowslot'); if (el) el.scrollIntoView({block: 'start'}); }
+}
+
+function drawSearch(q){
+  // whole-conference search: every day, every room, and the posters
+  var words = q.split(/\s+/).filter(Boolean);
+  var hit = function(s){ s = s.toLowerCase(); return words.every(function(w){ return s.indexOf(w) >= 0; }); };
+  var talks = D.talks.filter(function(t){ var s = SESS[t.session]; return hit([t.title, t.speaker, t.authors, t.affil, t.country, s.title, s.chairs.join(' ')].join(' ')); });
+  var posters = D.posters.filter(function(p){ return hit([p.board, p.title, p.presenter, p.authors, p.affil, p.country].join(' ')); });
+  if (schedState.room === 'posters') talks = [];
+  else if (schedState.room !== 'all') { talks = talks.filter(function(t){ return SESS[t.session].room === schedState.room; }); posters = []; }
+  var html = '<div class="meta" style="padding:12px 16px 0;font-size:13px">' + (talks.length + posters.length) + ' result' + (talks.length + posters.length === 1 ? '' : 's') + ' across all days' + (talks.length && posters.length ? ' (' + talks.length + ' talks, ' + posters.length + ' posters)' : '') + '</div>';
+  if (!talks.length && !posters.length) html += '<div class="empty-s">No results for “' + esc(schedState.q) + '”.</div>';
+  D.meta.days.forEach(function(d){
+    var ts = talks.filter(function(t){ return SESS[t.session].day === d; }).sort(function(a, b){ return mm(a.start) - mm(b.start); });
+    if (!ts.length) return;
+    html += '<div class="slot"><div class="slot-h"><span class="tm">' + esc(shortDay(d)) + '</span><span class="rule"></span><span class="n">' + ts.length + ' talk' + (ts.length > 1 ? 's' : '') + '</span></div>' +
+      ts.slice(0, 80).map(function(t){ return talkItem(t, SESS[t.session]); }).join('') + '</div>';
+  });
+  if (posters.length) html += '<div class="slot"><div class="slot-h"><span class="tm">Posters</span><span class="rule"></span><span class="n">' + posters.length + '</span></div>' + posters.slice(0, 80).map(posterItem).join('') + '</div>';
+  document.getElementById('slots').innerHTML = html;
 }
 
 /* ---------- INFO ---------- */

@@ -44,10 +44,16 @@ textarea{width:100%;min-height:88px;border:1px solid var(--mist);border-radius:1
 .done h2{font-family:"Space Grotesk",Inter,sans-serif;font-size:24px;margin:0 0 8px}
 .done a{color:var(--teal);font-weight:600}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.gift{margin:18px auto;max-width:340px;border:2px solid var(--amber);border-radius:16px;padding:16px;background:#fff}
+.gift h3{margin:0 0 8px;font-size:16px}
+.gift .qr{width:220px;height:220px;margin:0 auto}
+.gift .qr svg{width:100%;height:100%}
+.gift .code{font:700 30px "Space Grotesk",Inter,monospace;letter-spacing:.18em;margin:8px 0 4px}
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
+<script>/*QR*/</script>
 <script id="data" type="application/json">/*SURVEY*/</script>
 <script>
 (function(){
@@ -59,8 +65,13 @@ var app = document.getElementById('app');
 var Q = []; S.sections.forEach(function(s){ s.questions.forEach(function(q){ Q.push(q); }); });
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function sent(){ try { return localStorage.getItem(KEY) === '1'; } catch(e){ return false; } }
+var CODE_KEY = 'mcare2026-survey-code';
+function giftCode(){ try { return localStorage.getItem(CODE_KEY) || ''; } catch(e){ return ''; } }
+function qrSvg(text){ try { var q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({cellSize: 6, margin: 2, scalable: true}); } catch(e){ return ''; } }
 function thanks(){
-  app.innerHTML = '<header><h1>' + esc(S.title) + '</h1></header><div class="done"><h2>Thank you</h2><p>Your feedback has been received. It helps us plan the next MCARE.</p><p><a href="./">Back to the live program</a></p></div>';
+  var code = giftCode(), g = S.gift || {};
+  var gift = code && g.claimPage ? '<div class="gift"><h3>' + esc(g.title || 'Your gift code') + '</h3><div class="qr" role="img" aria-label="Gift QR code ' + esc(code) + '">' + qrSvg(g.claimPage + '#c=' + code) + '</div><div class="code">' + esc(code) + '</div><p>' + esc(g.text || '') + '</p><p class="note" style="margin:0">Tip: take a screenshot. This page also shows the code again if you reopen the survey on this device.</p></div>' : '';
+  app.innerHTML = '<header><h1>' + esc(S.title) + '</h1></header><div class="done"><h2>Thank you</h2><p>Your feedback has been received. It helps us plan the next MCARE.</p>' + gift + '<p><a href="./">Back to the live program</a></p></div>';
   window.scrollTo(0, 0);
 }
 if (sent() && !/[?&]again=1/.test(location.search)) { thanks(); return; }
@@ -107,8 +118,8 @@ document.getElementById('send').addEventListener('click', function(){
   var b = this; b.disabled = true; b.textContent = 'Sending...'; err.style.display = 'none';
   var body = {}; Object.keys(ans).forEach(function(k){ var v = ans[k]; if (typeof v === 'string') v = v.trim(); if (v !== '') body[k] = v; });
   fetch(S.endpoint.replace(/\/$/, '') + '/submit', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)})
-    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); }); })
-    .then(function(){ try { localStorage.setItem(KEY, '1'); } catch(e){} thanks(); })
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok || !j.ok) throw new Error(j.error || 'Error'); return j; }); })
+    .then(function(j){ try { localStorage.setItem(KEY, '1'); if (j.code) localStorage.setItem(CODE_KEY, j.code); } catch(e){} thanks(); })
     .catch(function(x){ err.textContent = 'Could not send your feedback (' + x.message + '). Please check your connection and try again.'; err.style.display = 'block'; b.disabled = false; b.textContent = 'Submit feedback'; });
 });
 })();
