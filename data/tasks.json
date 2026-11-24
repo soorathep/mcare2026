@@ -256,7 +256,7 @@
   },
   {
    "id": 28,
-   "title": "Announce the feedback survey at the closing session; keep it open for one week",
+   "title": "Announce the feedback survey (open in the app from 16 Dec) and at the closing session; keep it open for one week",
    "category": "Web app and QR",
    "owner": "Soorathep",
    "due": "2026-12-18",
@@ -360,7 +360,7 @@
    "owner": "Soorathep",
    "due": "2026-12-04",
    "status": "doing",
-   "note": "24 Nov: survey now gives each respondent a QR gift code; desk staff scan it on claim.html (desk token) and the system blocks a second claim. Still to decide: gift desk location, desk staff, and when the survey opens in the app (now 18 Dec)"
+   "note": "24 Nov: survey now gives each respondent a QR gift code; desk staff scan it on claim.html (desk token) and the system blocks a second claim. Still to decide: gift desk location, desk staff, and survey card opens in the app from 16 Dec (decided 24 Nov)"
   },
   {
    "id": 40,

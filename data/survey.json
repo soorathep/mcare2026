@@ -2,7 +2,7 @@
  "title": "MCARE 2026 Feedback",
  "intro": "Thank you for joining MCARE 2026. This survey takes about 5 minutes and is anonymous. When you finish, you will get a QR code to collect a thank-you gift at the registration desk.",
  "endpoint": "https://mcare2026-survey.ecs-thailand-election.workers.dev",
- "showInAppFrom": "2026-12-18",
+ "showInAppFrom": "2026-12-16",
  "sections": [
   {
    "title": "About you",
