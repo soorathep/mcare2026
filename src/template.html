@@ -307,7 +307,7 @@ function viewNow(){
       var open = mm(p.display[0]) <= now.min;
       h += '<a class="card" href="' + href({posters: p.id}) + '"><div class="row">' + IC.poster + '<span class="rname">Poster Session ' + p.id + '</span><span class="grow"></span>' +
         (open ? liveChip('OPEN') : '<span class="chip soon">Starts ' + p.display[0] + '</span>') + '</div>' +
-        '<div style="font-size:14px">' + esc(D.meta.posterArea) + ' · on display ' + p.display[0] + '–' + p.display[1] + '<br><span class="muted">' + p.count + ' posters · Boards ' + p.id + '-001 to ' + p.id + '-' + ('00' + p.count).slice(-3) + ' · Symposia ' + p.symposia.join(', ') + '</span></div>' +
+        '<div style="font-size:14px">' + esc(D.meta.posterArea) + ' · on display ' + p.display[0] + '–' + p.display[1] + '<br><span class="muted">' + p.count + ' posters · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + ' · Symposia ' + p.symposia.join(', ') + '</span></div>' +
         '<div class="box"><b>Presenters at boards (core time):</b> ' + p.core[0] + '–' + p.core[1] + '</div><span class="link">Browse posters</span></a>';
     });
     h += '</div>';
@@ -476,16 +476,22 @@ function viewTalk(){
     '<div class="row">' + (live ? liveChip() : '') + '<span class="chip type">' + esc(t.type) + '</span></div>' +
     '<h1 style="font-size:25px;font-weight:600;line-height:1.2">' + esc(ttl(t)) + '</h1>' +
     '<div style="font-size:15px"><b>' + esc(t.speaker) + '</b><br><span class="muted" style="font-size:14px">' + esc(t.affil) + '</span></div>' +
-    (t.coauthors && t.coauthors.length ? '<div class="meta" style="font-size:13px">Co-authors: ' + esc(t.coauthors.join(', ')) + '</div>' : '') + '</header>';
+    (t.authors ? '<div class="meta" style="font-size:13px">' + esc(t.authors) + '</div>' : '') + '</header>';
   h += '<div class="dl"><div><span>When</span><span>' + esc(shortDay(s.day)) + ' · ' + t.start + '–' + t.end + '</span></div>' +
     '<div><span>Where</span><span><span class="dot" style="background:' + r.color + ';width:8px;height:8px;margin-right:6px"></span>' + esc(r.name) + ' · ' + esc(r.floor) + '</span></div>' +
     '<div><span>Session</span><span>' + esc(s.symposium ? 'Symposium ' + s.symposium : s.title) + (s.symposium ? '<br><span class="muted" style="font-weight:400">' + esc(s.title) + '</span>' : '') + '</span></div>' +
     (s.chairs.length ? '<div><span>Chair' + (s.chairs.length > 1 ? 's' : '') + '</span><span>' + s.chairs.map(esc).join('<br>') + '</span></div>' : '') + '</div>';
   h += '<div class="btns" style="margin:12px 16px 0">' + saveBtn(t.id).replace('class="btn"', 'class="btn pri"') + '<button type="button" class="btn" data-share="1">' + IC.share + 'Share</button></div>';
-  h += '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml(t.abstract) + '</div>';
+  h += absBlock(t);
   var nx = (TALKS_OF[s.id] || []).filter(function(x){ return mm(x.start) >= mm(t.end); })[0];
   if (nx) h += '<div class="stack" style="padding-top:16px"><a class="card dash" href="' + href({talk: nx.id}) + '"><span class="label">Next in ' + esc(r.name) + ' · ' + nx.start + '</span><span class="ttl">' + esc(ttl(nx)) + '</span><span class="meta" style="font-size:13px">' + esc(nx.speaker) + ' · ' + esc(nx.affil) + '</span></a></div>';
   return shell(h, 'schedule');
+}
+function absBlock(x){
+  if (x.abstract) return '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml(x.abstract) + '</div>';
+  if (!x.authorAffils && !x.abstractNo) return '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml('') + '</div>';
+  return '<div class="sec"><h2>Author affiliations</h2></div><div class="abs" style="font-size:14px">' + (x.authorAffils ? '<p>' + esc(x.authorAffils) + '</p>' : '') +
+    (x.abstractNo ? '<p class="muted" style="font-size:13px">Abstract No. ' + esc(x.abstractNo) + (x.country ? ' · ' + esc(x.country) : '') + '</p>' : '') + '</div>';
 }
 function absHtml(a){
   if (!a) return '<p class="muted">The abstract will be added soon.</p>';
@@ -611,17 +617,18 @@ function rowOf(b){ return String.fromCharCode(65 + Math.floor((boardNum(b) - 1) 
 function panelOf(b){ return Math.floor(((boardNum(b) - 1) % PER_ROW) / 2) + 1; }
 function faceOf(b){ return boardNum(b) % 2 ? 'upper face' : 'lower face'; }
 function pad3(n){ return ('00' + n).slice(-3); }
+function bid(sid, n){ return (D.meta.boardPrefix || '') + sid + '-' + pad3(n); }
 var posterState = {sym: 'all', row: null, q: ''};
 function viewPosters(){
   var p = PSES[Q.get('posters')] || D.posterSessions[0];
   var rows = Math.ceil(p.count / PER_ROW);
   var h = '<header class="whdr" style="border-top:6px solid var(--ink)">' + backLink(href(), 'Now') +
-    '<div><h1>Poster Session ' + p.id + '</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(shortDay(p.day)) + ' · ' + esc(D.meta.posterArea) + '</div><div class="meta" style="font-size:13px;margin-top:2px">' + p.count + ' posters · Boards ' + p.id + '-001 to ' + p.id + '-' + pad3(p.count) + ' · Symposia ' + p.symposia.join(', ') + '</div></div>' +
+    '<div><h1>Poster Session ' + p.id + '</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(shortDay(p.day)) + ' · ' + esc(D.meta.posterArea) + '</div><div class="meta" style="font-size:13px;margin-top:2px">' + p.count + ' posters · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + ' · Symposia ' + p.symposia.join(', ') + '</div></div>' +
     '<div class="btns" style="gap:8px"><div class="box"><b style="display:block;font-size:12px" class="g">On display</b><b style="font-size:14px">' + p.display[0] + '–' + p.display[1] + '</b></div><div class="box"><b style="display:block;font-size:12px" class="g">Presenters at boards</b><b style="font-size:14px">' + p.core[0] + '–' + p.core[1] + '</b></div></div></header>';
   h += '<div class="stack" style="padding-top:16px"><div class="card"><div class="row" style="justify-content:space-between"><span class="sec" style="padding:0"><h2>Floor map</h2></span><a class="link" style="font-size:13px" href="' + href({map: p.id}) + '">Open full map</a></div><div class="zones" id="zones">';
   for (var i = 0; i < rows; i++) {
     var a = i * PER_ROW + 1, b = Math.min(p.count, (i + 1) * PER_ROW), L = String.fromCharCode(65 + i);
-    h += '<button type="button" class="zone" data-row="' + L + '" aria-pressed="false"><b>Row ' + L + '</b><span>' + p.id + '-' + pad3(a) + ' to ' + p.id + '-' + pad3(b) + '</span></button>';
+    h += '<button type="button" class="zone" data-row="' + L + '" aria-pressed="false"><b>Row ' + L + '</b><span>' + bid(p.id, a) + ' to ' + bid(p.id, b) + '</span></button>';
   }
   h += '</div></div></div>';
   h += '<div style="padding:16px 16px 0;display:flex;flex-direction:column;gap:10px"><label class="search" style="background:#fff">' + IC.search + '<span class="sr">Search posters</span><input type="search" id="pq" placeholder="Board no., presenter or title" autocomplete="off"></label>' +
@@ -668,25 +675,25 @@ function viewPoster(){
     '<header class="whdr">' + backLink(href({posters: p.id}), 'Poster Session ' + p.id) +
     '<div class="row" style="gap:12px"><span class="bigboard"><small>BOARD</small><b>' + esc(x.board) + '</b></span><span style="display:flex;flex-direction:column;gap:2px;font-size:14px"><b>Row ' + rowOf(x.board) + ' · Panel ' + panelOf(x.board) + ' · ' + faceOf(x.board) + '</b><span class="muted">Symposium ' + x.symposium + (open ? '' : '') + '</span></span><span class="grow"></span>' + (open ? liveChip('OPEN') : '') + '</div>' +
     '<h1 style="font-size:23px;font-weight:600;line-height:1.22">' + esc(x.title) + '</h1><div style="font-size:15px"><b>' + esc(x.presenter) + '</b><br><span class="muted" style="font-size:14px">' + esc(x.affil) + '</span></div>' +
-    (x.coauthors && x.coauthors.length ? '<div class="meta" style="font-size:13px">Co-authors: ' + esc(x.coauthors.join(', ')) + '</div>' : '') + '</header>';
+    (x.authors ? '<div class="meta" style="font-size:13px">' + esc(x.authors) + '</div>' : '') + '</header>';
   h += '<div class="dl"><div><span>Session</span><span>' + esc(shortDay(p.day)) + ' · on display ' + p.display[0] + '–' + p.display[1] + '</span></div><div><span>Presenter at board</span><span>' + p.core[0] + '–' + p.core[1] + '<br><span class="muted" style="font-weight:400">Core time</span></span></div><div><span>Where</span><span>' + esc(D.meta.posterArea) + ' · Row ' + rowOf(x.board) + ', panel ' + panelOf(x.board) + '</span></div></div>';
   h += '<div class="stack" style="padding-top:12px"><a class="card" href="' + href({map: p.id, b: x.board}) + '" style="flex-direction:row;align-items:center;gap:14px"><span style="display:flex;flex-direction:column;gap:3px"><b style="font-size:14px">Find this poster</b><span class="meta" style="font-size:13px">Row ' + rowOf(x.board) + ', panel ' + panelOf(x.board) + ', ' + faceOf(x.board) + '</span><span class="link">Show on floor map</span></span></a></div>';
   h += '<div class="btns" style="margin:12px 16px 0">' + saveBtn('p:' + x.board).replace('class="btn"', 'class="btn pri"') + '<button type="button" class="btn" data-share="1">' + IC.share + 'Share</button></div>';
   var jc = null; try { jc = localStorage.getItem('mcare2026-judge'); } catch(e){}
   if (jc) h += '<div style="margin:12px 16px 0"><a class="btn" style="background:var(--ink);border-color:var(--ink);color:#fff" href="judge.html?b=' + encodeURIComponent(x.board) + '">Score this poster (judges)</a></div>';
-  h += '<div class="sec"><h2>Abstract</h2></div><div class="abs">' + absHtml(x.abstract) + '</div>';
+  h += absBlock(x);
   return shell(h, 'now');
 }
 function viewMap(){
   var p = PSES[Q.get('map')] || D.posterSessions[0];
   var target = Q.get('b') || '';
   var h = '<header class="whdr" style="border-top:6px solid var(--ink)">' + backLink(href({posters: p.id}), 'Poster Session ' + p.id) +
-    '<div><h1 style="font-size:28px">Poster floor map</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(D.meta.posterArea) + ' · ' + Math.ceil(p.count / 2) + ' panels · Boards ' + p.id + '-001 to ' + p.id + '-' + pad3(p.count) + '</div></div>' +
+    '<div><h1 style="font-size:28px">Poster floor map</h1><div class="g" style="font-size:14px;margin-top:4px">' + esc(D.meta.posterArea) + ' · ' + Math.ceil(p.count / 2) + ' panels · Boards ' + bid(p.id, 1) + ' to ' + bid(p.id, p.count) + '</div></div>' +
     '<label class="search">' + IC.search + '<span class="sr">Find a board number</span><input type="search" id="mq" inputmode="numeric" placeholder="Find a board number, e.g. 14" value="' + esc(target ? boardNum(target) : '') + '" autocomplete="off"></label></header>' +
     '<div id="mapwrap"></div>';
   setTimeout(function(){
     var draw = function(v){ drawMap(p, v); };
-    document.getElementById('mq').addEventListener('input', function(){ var n = parseInt(this.value.replace(/^\d+-/, ''), 10); draw(n > 0 && n <= p.count ? n : 0); });
+    document.getElementById('mq').addEventListener('input', function(){ var n = parseInt(this.value.replace(/^p?\d+-/i, ''), 10); draw(n > 0 && n <= p.count ? n : 0); });
     draw(target ? boardNum(target) : 0);
   }, 0);
   return shell(h, 'now');
@@ -697,7 +704,7 @@ function drawMap(p, n){
   var h = '<div class="stack" style="padding-top:16px"><div class="card" style="padding:14px 12px;gap:10px"><div style="display:flex;justify-content:center"><span class="tag">Ballroom doors</span></div><div class="map">';
   for (var r = 0; r < rows; r++) {
     var a = r * PER_ROW + 1, b = Math.min(p.count, (r + 1) * PER_ROW), L = String.fromCharCode(65 + r);
-    h += '<div><div class="mrow-h"><b>Row ' + L + '</b><span class="g" style="font-size:11px">' + p.id + '-' + pad3(a) + ' to ' + p.id + '-' + pad3(b) + '</span></div><div class="panels">';
+    h += '<div><div class="mrow-h"><b>Row ' + L + '</b><span class="g" style="font-size:11px">' + bid(p.id, a) + ' to ' + bid(p.id, b) + '</span></div><div class="panels">';
     for (var k = 0; k < half; k++) {
       var top = a + k * 2, bot = top + 1;
       if (top > p.count) { h += '<div class="panel empty"><span></span><span></span></div>'; continue; }
@@ -708,7 +715,7 @@ function drawMap(p, n){
   h += '</div><div class="row" style="justify-content:space-between"><span class="tag s">Entrance · Lifts</span><span class="tag">Registration desk</span></div>' +
     (D.meta.sample ? '<span class="meta" style="font-size:11px">Layout is indicative. Panel positions will follow the hotel floor plan.</span>' : '') + '</div>';
   if (n) {
-    var bd = p.id + '-' + pad3(n), x = POSTER[bd];
+    var bd = bid(p.id, n), x = POSTER[bd];
     h += '<div class="card" style="flex-direction:row;align-items:center;gap:14px;border:2px solid var(--amber)"><span class="bigboard"><small>BOARD</small><b style="font-size:22px">' + bd + '</b></span><span style="display:flex;flex-direction:column;gap:3px;font-size:14px"><b>Row ' + rowOf(bd) + ' · Panel ' + panelOf(bd) + ' · ' + faceOf(bd) + '</b>' + (x ? '<a class="link" href="' + href({poster: bd}) + '">' + esc(x.title) + '</a>' : '') + '</span></div>';
   }
   h += '<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><div aria-hidden="true" class="panel" style="width:26px;flex-shrink:0"><span style="height:14px"></span><span style="height:14px"></span></div><span style="font-size:13px" class="g">Each panel holds two boards, one on each face. The odd number faces the aisle above the row and the even number faces the aisle below.</span></div></div>';

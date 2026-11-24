@@ -214,7 +214,7 @@
    "owner": "Soorathep",
    "due": "2026-12-04",
    "status": "doing",
-   "note": "23 Nov: 267 talks loaded from Program at a Glance (times, rooms, speakers, affiliations). Still needed: talk titles, chairs, abstracts, poster list"
+   "note": "23 Nov: full program database loaded (267 talks with titles and authors, 316 posters). Still needed: session chairs (promised by 27 Nov)"
   },
   {
    "id": 24,
@@ -308,12 +308,12 @@
   },
   {
    "id": 34,
-   "title": "Ask for a fuller program export: talk titles, session chairs, full affiliations (68 are cut short with …), abstracts",
+   "title": "Get session chairs (organizers promised them by 27 Nov)",
    "category": "Program and slides",
    "owner": "Program team",
-   "due": "2026-11-30",
+   "due": "2026-11-27",
    "status": "todo",
-   "note": "Re-import with tools/import_glance.py; titles/chairs need extra columns"
+   "note": "Re-import with tools/import_database.py; a Chair column is picked up automatically"
   },
   {
    "id": 35,
@@ -321,8 +321,17 @@
    "category": "Posters",
    "owner": "Program team",
    "due": "2026-12-04",
+   "status": "done",
+   "note": "316 posters received 23 Nov (P1: 106, P2: 109, P3: 101)"
+  },
+  {
+   "id": 36,
+   "title": "Round 2 has 109 posters but the Pre-function area holds 108 boards (54 panels): add one panel or move one poster",
+   "category": "Posters",
+   "owner": "Program team",
+   "due": "2026-12-04",
    "status": "todo",
-   "note": "Needed for the poster pages and judge assignment"
+   "note": "Board P2-109 currently has no place on the layout"
   }
  ]
 }
